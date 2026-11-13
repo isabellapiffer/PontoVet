@@ -1,0 +1,251 @@
+.historico {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cada tópico (Alergias, Cirurgias...) separado por uma linha fina */
+.topico {
+  border-bottom: 1px solid #f0e8fb;
+}
+
+.topico:last-child {
+  border-bottom: none;
+}
+
+.topico-titulo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  color: #2a1f3d;
+  cursor: pointer;
+}
+
+.topico-titulo strong {
+  display: block;
+  font-size: 16px;
+}
+
+.topico-resumo {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+.topico-resumo-vazio {
+  color: #9a8cb5;
+}
+
+.topico-titulo svg {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: #6b5b8a;
+}
+
+.topico-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 16px;
+}
+
+.topico-dica {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+/* Pergunta seguinte dentro do mesmo tópico
+   (ex.: "Toma alguma medicação de uso contínuo?" em Doenças em tratamento) */
+.topico-pergunta {
+  margin-top: 6px;
+  color: #4a2a7a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.topico-texto {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid #d9c4fa;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  color: #2a1f3d;
+  resize: vertical;
+}
+
+/* Botões Sim / Não */
+.sim-nao {
+  display: flex;
+  gap: 8px;
+}
+
+.sim-nao-opcao {
+  padding: 8px 20px;
+  border: 1px solid #e6dcf7;
+  border-radius: 999px;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6b5b8a;
+  cursor: pointer;
+}
+
+.sim-nao-ativo {
+  background: #8a3ffc;
+  border-color: #8a3ffc;
+  color: #ffffff;
+}
+
+/* Lista com "+" e lixeira */
+.lista-mais {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lista-mais-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lista-mais-linha input {
+  flex: 1;
+  min-width: 0;
+}
+
+.lista-mais-remover {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: #9a8cb5;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.lista-mais-remover:hover {
+  background: #fdecec;
+  color: #c0392b;
+}
+
+.lista-mais-adicionar {
+  align-self: flex-start;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #8a3ffc;
+  cursor: pointer;
+}
+
+/* Doenças anteriores: cada doença num cartão, com os medicamentos embaixo */
+.doenca-cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e6dcf7;
+  border-radius: 12px;
+}
+
+.doenca-rotulo {
+  color: #4a2a7a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Botão "Pronto": fecha o cartão da doença (o banco só grava no Salvar do final) */
+.doenca-pronto {
+  align-self: flex-end;
+  padding: 9px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #8a3ffc;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+/* Doença fechada: resumo com o lápis ao lado */
+.doenca-fechada {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e6dcf7;
+  border-radius: 12px;
+  background: #faf6ff;
+}
+
+.doenca-fechada strong {
+  display: block;
+  font-size: 15px;
+  color: #2a1f3d;
+}
+
+.doenca-fechada-med {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+/* Mesmo lápis cinza do perfil do pet */
+.doenca-alterar {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: #e6e6ec;
+  color: #5f5f6e;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.doenca-alterar:hover {
+  background: #d9d9e1;
+}
+
+/* Data do diagnóstico: rótulo em cima, campo curto embaixo
+   (.doenca-cartao na frente para ganhar do ".login-form label", que tem letra maior) */
+.doenca-cartao label.doenca-rotulo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.doenca-data {
+  max-width: 140px;
+}

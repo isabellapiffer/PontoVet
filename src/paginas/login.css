@@ -1,0 +1,171 @@
+.login-pagina {
+  width: 92%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 0 100px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.login-logo {
+  width: 190px;
+  margin-top: 24px;
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #4A2A7A;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.login-form input {
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 1px solid #D9C4FA;
+  border-radius: 12px;
+  color: #2A1F3D;
+}
+
+.login-form input.campo-valido {
+  border-color: #2E9E4A;
+}
+
+.login-form input.campo-invalido {
+  border-color: #D43939;
+}
+
+.login-form .botao-login {
+  width: 100%;
+  max-width: none;
+}
+
+.link-esqueceu {
+  color: #8A3FFC;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.botao-criar-conta {
+  background-color: transparent;
+  color: #8A3FFC;
+  border: 2px solid #8A3FFC;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.login-opcoes {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-opcoes button {
+  background-color: #8A3FFC;
+  color: white;
+  border: none;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.botao-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: white;
+  color: #2A1F3D;
+  border: 1px solid #D9C4FA;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.divisor-ou {
+  text-align: center;
+  color: #6B5B8A;
+  font-size: 13px;
+}
+
+.dica-campo {
+  color: #6B5B8A;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.aviso-cpf {
+  color: #D43939;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.campo-senha {
+  position: relative;
+}
+
+.campo-senha input {
+  width: 100%;
+  padding-right: 44px;
+  box-sizing: border-box;
+}
+
+.icone-olho {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6B5B8A;
+  cursor: pointer;
+}
+
+.requisitos-senha {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.requisito-ok {
+  color: #2E9E4A;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.requisito-erro {
+  color: #D43939;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.login-secao-titulo {
+  width: 100%;
+  margin: 8px 0 -4px;
+  padding-top: 12px;
+  border-top: 1px solid #D9C4FA;
+  color: #8A3FFC;
+  font-size: 15px;
+}

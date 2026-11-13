@@ -1,0 +1,34 @@
+/* Campo de data com o botão "Data atual" ao lado */
+.campo-data {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.campo-data input {
+  flex: 1;
+  min-width: 0;
+  max-width: 160px;
+}
+
+.campo-data-hoje {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border: 1px solid #d9c4fa;
+  border-radius: 10px;
+  background: #f3ecff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #8a3ffc;
+  cursor: pointer;
+}
+
+.campo-data-hoje:hover {
+  background: #e9dcff;
+}
+
+.campo-data-hoje:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

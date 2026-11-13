@@ -1,0 +1,44 @@
+.buscar-atendimento {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #8a3ffc;
+}
+
+.buscar-atendimento-titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Parece um campo de busca, mas é um botão que abre a tela Buscar */
+.buscar-atendimento-campo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #6b5b8a;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.buscar-atendimento-campo:hover {
+  background: #f3ecff;
+}
+
+.buscar-atendimento-lupa {
+  flex-shrink: 0;
+  color: #8a3ffc;
+  font-size: 20px;
+}

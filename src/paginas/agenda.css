@@ -1,0 +1,552 @@
+/* Agenda do tutor (protótipo de 04/11/2026) */
+
+.agenda-pagina {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  /* espaço embaixo para a barra roxa não cobrir a lista */
+  padding: 28px 20px 110px;
+  background: #ffffff;
+  color: #2a1f3d;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* Topo: "Agenda" + mês com as setas */
+.agenda-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.agenda-titulo {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Ícone de calendário à direita da linha do mês (abre e fecha o mês) */
+.agenda-botao-mes {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: #f3ecff;
+  color: #8a3ffc;
+  font-size: 22px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.agenda-botao-mes:hover {
+  background: #e6dcf7;
+}
+
+.agenda-botao-mes-ativo,
+.agenda-botao-mes-ativo:hover {
+  background: #8a3ffc;
+  color: #ffffff;
+}
+
+/* Linha logo acima da semana: "‹ Novembro 2026 ›" à esquerda, ícone à direita */
+.agenda-mes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: -10px;
+}
+
+.agenda-mes-navegar {
+  display: flex;
+  align-items: center;
+  margin-left: -10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.agenda-seta {
+  width: 36px;
+  height: 44px;
+  border: none;
+  background: none;
+  color: #4a2a7a;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.agenda-seta:hover {
+  background: #f3ecff;
+}
+
+/* Filtro por pet */
+.agenda-filtro {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto; /* muitos pets: arrasta para o lado */
+  margin-right: -20px;
+  padding-right: 20px;
+}
+
+.agenda-filtro-item {
+  width: 68px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.agenda-todos,
+.agenda-filtro-foto {
+  width: 52px;
+  height: 52px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2px solid #e6dcf7;
+  background: #f3ecff;
+  object-fit: cover;
+}
+
+.agenda-todos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a2a7a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.agenda-todos-ativo {
+  border-color: #8a3ffc;
+  background: #8a3ffc;
+  color: #ffffff;
+}
+
+.agenda-filtro-foto-ativa {
+  border: 3px solid #8a3ffc;
+}
+
+.agenda-filtro-nome {
+  max-width: 68px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b5b8a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Patinha quando o pet não tem foto */
+.agenda-foto-vazia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b77eff;
+}
+
+/* Semana ou mês */
+.agenda-calendario {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  border-radius: 18px;
+  background: #faf6ff;
+}
+
+.agenda-grade {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px 2px;
+}
+
+.agenda-grade-letra {
+  text-align: center;
+  padding-bottom: 4px;
+}
+
+.agenda-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  border: none;
+  border-radius: 14px;
+  background: none;
+  font-family: inherit;
+  color: #2a1f3d;
+  cursor: pointer;
+}
+
+.agenda-dia:hover {
+  background: #f3ecff;
+}
+
+.agenda-dia-letra {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b5b8a;
+}
+
+.agenda-dia-numero {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* Hoje (quando não está escolhido): número roxo */
+.agenda-dia-hoje .agenda-dia-numero {
+  color: #8a3ffc;
+}
+
+.agenda-dia-escolhido,
+.agenda-dia-escolhido:hover {
+  background: #8a3ffc;
+  color: #ffffff;
+}
+
+.agenda-dia-escolhido .agenda-dia-letra {
+  color: #ffffff;
+}
+
+/* Bolinha embaixo do dia que tem compromisso */
+.agenda-bolinha {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.agenda-bolinha-ativa {
+  background: #8a3ffc;
+}
+
+.agenda-dia-escolhido .agenda-bolinha-ativa {
+  background: #ffffff;
+}
+
+
+/* Lista do dia */
+.agenda-dia-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.agenda-dia-titulo {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.agenda-vazio {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+.agenda-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid #e6dcf7;
+  background: #ffffff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.agenda-item:hover {
+  background: #faf6ff;
+}
+
+.agenda-item-icone {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #f3ecff;
+  color: #8a3ffc;
+  font-size: 18px;
+}
+
+/* Compromisso (consulta, exame, vacina agendada): ícone roxo forte */
+.agenda-item-icone-forte {
+  background: #8a3ffc;
+  color: #ffffff;
+}
+
+.agenda-item-hora {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a2a7a;
+}
+
+/* Próximos agendamentos: data ("30/11") com a hora embaixo, à direita */
+.agenda-item-quando {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.agenda-item-quando small {
+  font-size: 12px;
+  color: #6b5b8a;
+}
+
+/* Botão redondo "+" fixo, acima da barra roxa */
+.agenda-botao-adicionar {
+  position: fixed;
+  right: max(20px, calc(50% - 260px));
+  bottom: 96px;
+  z-index: 60;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: #8a3ffc;
+  color: #ffffff;
+  font-size: 24px;
+  box-shadow: 0 6px 16px rgba(74, 42, 122, 0.35);
+  cursor: pointer;
+}
+
+.agenda-botao-adicionar:hover {
+  background: #7a2ff0;
+}
+
+.agenda-item-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.agenda-item-titulo {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.agenda-item-tipo {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+/* Gaveta de detalhes (sobe de baixo) */
+.agenda-gaveta-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(42, 31, 61, 0.45);
+}
+
+.agenda-gaveta {
+  width: 100%;
+  max-width: 560px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 20px 28px;
+  border-radius: 24px 24px 0 0;
+  background: #ffffff;
+}
+
+.agenda-gaveta-alca {
+  align-self: center;
+  width: 40px;
+  height: 5px;
+  border-radius: 999px;
+  background: #e6dcf7;
+}
+
+.agenda-gaveta-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.agenda-gaveta-tipo {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8a3ffc;
+}
+
+.agenda-gaveta-titulo {
+  margin: 2px 0 0;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.agenda-gaveta-fechar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: #4a2a7a;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.agenda-gaveta-fechar:hover {
+  background: #f3ecff;
+}
+
+.agenda-gaveta-dados {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.agenda-gaveta-dados > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0e8fb;
+}
+
+.agenda-gaveta-dados dt {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b5b8a;
+}
+
+.agenda-gaveta-dados dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.agenda-gaveta-pet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agenda-gaveta-pet-foto {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f3ecff;
+  font-size: 13px;
+}
+
+.agenda-gaveta-erro {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #b3261e;
+}
+
+.agenda-gaveta-botao {
+  margin-top: 10px;
+  min-height: 48px;
+  border-radius: 999px;
+  border: none;
+  background: #8a3ffc;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.agenda-gaveta-botao:disabled {
+  background: #c9a6ff;
+  cursor: not-allowed;
+}
+
+.agenda-gaveta-botao-excluir {
+  border: 2px solid #b3261e;
+  background: #ffffff;
+  color: #b3261e;
+}
+
+.agenda-gaveta-botao-excluir:disabled {
+  border-color: #e0a9a5;
+  background: #ffffff;
+  color: #e0a9a5;
+}
+
+.agenda-gaveta-botao-contorno {
+  border: 2px solid #8a3ffc;
+  background: #ffffff;
+  color: #4a2a7a;
+}
+
+/* Horários do preparo no detalhe do exame: "Jejum a partir de 01:00 · Dar Luftal às 08:00" */
+.agenda-gaveta-preparo {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: #8a3ffc;
+}
+
+/* Aviso "Salvo no histórico do Thor · Ver", acima do menu de baixo */
+.agenda-aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 168px; /* acima do botão "+" */
+  z-index: 60;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 520px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px 12px 16px;
+  border-radius: 14px;
+  background: #2a1f3d;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.agenda-aviso-ver {
+  min-height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: #8a3ffc;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}

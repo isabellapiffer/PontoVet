@@ -1,0 +1,102 @@
+.agendamentos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.agendamentos-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.agendamentos-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.agendamentos-botao-agenda {
+  min-height: 44px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: #8a3ffc;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.agendamentos-botao-agenda:hover {
+  background: #f3ecff;
+}
+
+.agendamentos-vazio {
+  margin: 0;
+  padding: 20px;
+  border-radius: 16px;
+  background: #faf6ff;
+  color: #6b5b8a;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.agendamentos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agendamentos-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e6dcf7;
+  border-radius: 16px;
+  background: #ffffff;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.agendamentos-item:hover {
+  background: #faf6ff;
+}
+
+.agendamentos-icone {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #f3ecff;
+  color: #8a3ffc;
+  font-size: 22px;
+}
+
+.agendamentos-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.agendamentos-linha-1 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.agendamentos-linha-2 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5b8a;
+}

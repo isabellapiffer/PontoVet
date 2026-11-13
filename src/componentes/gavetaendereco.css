@@ -1,0 +1,136 @@
+/* Fundo escurecido atrás da gaveta (clicar nele fecha) */
+.gaveta-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(42, 31, 61, 0.45);
+}
+
+.gaveta {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px 16px 24px;
+  border-radius: 24px 24px 0 0;
+  background: #ffffff;
+  animation: gaveta-subir 0.25s ease-out;
+}
+
+@keyframes gaveta-subir {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.gaveta-alca {
+  align-self: center;
+  width: 40px;
+  height: 5px;
+  border-radius: 999px;
+  background: #e6dcf7;
+}
+
+.gaveta-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gaveta-titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.gaveta-fechar {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: #4a2a7a;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.gaveta-fechar:hover {
+  background: #f3ecff;
+}
+
+.gaveta-localizacao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid #e6dcf7;
+  border-radius: 12px;
+  background: #faf6ff;
+  color: #8a3ffc;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gaveta-localizacao:hover {
+  background: #f3ecff;
+}
+
+.gaveta-localizacao svg {
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.gaveta-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #2a1f3d;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gaveta-campo input {
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1px solid #e6dcf7;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  color: #2a1f3d;
+}
+
+.gaveta-erro {
+  margin: 0;
+  color: #d43939;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gaveta-confirmar {
+  min-height: 48px;
+  border: none;
+  border-radius: 999px;
+  background: #8a3ffc;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}

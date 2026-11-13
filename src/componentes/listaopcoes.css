@@ -1,0 +1,20 @@
+/* Lista de escolher ao lado de um número (ex.: dose [1] [comprimido(s)]) */
+.lista-opcoes {
+  flex: 1;
+  min-width: 0;
+}
+
+.lista-opcoes .select-caixa {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d9c4fa;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  color: #2a1f3d;
+}
+
+.lista-opcoes .select-opcoes {
+  border-color: #d9c4fa;
+  border-radius: 12px;
+}

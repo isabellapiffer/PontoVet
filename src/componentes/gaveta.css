@@ -1,0 +1,46 @@
+/* Nomes com "secao-" para não misturar com a gaveta de endereço (gavetaendereco.css)
+   Sem borda em volta: só o título lilás separa uma gaveta da outra */
+.secao-gaveta {
+  display: flex;
+  flex-direction: column;
+}
+
+.secao-gaveta-titulo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: #f3ecff;
+  color: #4a2a7a;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.secao-gaveta-titulo svg {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Gaveta logo abaixo de uma FECHADA: os títulos ficam quase colados (3px).
+   O formulário separa os itens com 14px; -11px deixa 3px */
+.secao-gaveta + .secao-gaveta {
+  margin-top: -11px;
+}
+
+/* Abaixo de uma ABERTA: mais espaço, para o último campo não colar no título (24px) */
+.secao-gaveta-aberta + .secao-gaveta {
+  margin-top: 10px;
+}
+
+.secao-gaveta-corpo {
+  padding: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}

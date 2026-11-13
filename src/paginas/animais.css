@@ -1,0 +1,233 @@
+.animais-pagina {
+  width: 92%;
+  max-width: 480px;
+  margin: 0 auto;
+  /* espaço embaixo para a lista não ficar escondida atrás do botão e da barra */
+  padding: 24px 0 160px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Botão fixo logo acima da barra de baixo (a barra tem uns 76px de altura) */
+.animais-botao-cadastrar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 88px;
+  z-index: 5;
+  width: auto;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 48px;
+  font-family: inherit;
+}
+
+/* Lista de pets na largura toda, igual ao botão */
+.animais-pagina .lista-cards {
+  width: 100%;
+}
+
+.animais-titulo {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.animais-vazio {
+  color: #6B5B8A;
+  font-size: 14px;
+}
+
+/* Erro ao carregar os pets: texto e botão no meio da tela */
+.animais-erro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.animais-erro-texto {
+  margin: 0;
+  color: #6B5B8A;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.animais-botao-recarregar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid #8A3FFC;
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  color: #8A3FFC;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.animais-botao-recarregar:hover {
+  background-color: #f3ecff;
+}
+
+/* Card do pet (protótipo de 04/11/2026, opção B): o formato vem do
+   card-vet (mural.css); aqui só as cores, um lilás médio com borda */
+.card-pet {
+  border-color: #c9b3ef;
+  background: #e9dcff;
+}
+
+.card-pet:hover {
+  background: #e1cfff;
+}
+
+.card-pet .card-vet-foto {
+  box-sizing: border-box;
+  border: 2px solid #ffffff;
+  background: #f3ecff;
+}
+
+.card-pet .etiqueta-especialidade {
+  background: #8a3ffc;
+  color: #ffffff;
+}
+
+.card-pet .card-vet-local {
+  color: #4a2a7a;
+}
+
+/* Setinha dentro de um círculo branco */
+.card-pet-seta {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #8a3ffc;
+  font-size: 14px;
+}
+
+.select-custom input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 1px solid #D9C4FA;
+  border-radius: 12px;
+  color: #2A1F3D;
+  outline: none;
+}
+
+.select-custom input:focus {
+  border-color: #8A3FFC;
+}
+
+.animais-checkbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+}
+
+.animais-checkbox input {
+  width: 18px;
+  height: 18px;
+}
+
+/* Idade aproximada: dois campos lado a lado (anos e meses) */
+
+.pet-idade {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pet-idade-titulo {
+  color: #4a2a7a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pet-idade-campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.login-form .pet-idade-campos label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  color: #6b5b8a;
+  font-weight: 600;
+}
+
+.pet-idade-campos input {
+  width: 64px;
+  text-align: center;
+  font-family: inherit;
+}
+
+/* Foto do pet no formulário: círculo de perfil */
+
+.login-form .pet-foto-circulo {
+  align-self: center;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.pet-foto-input {
+  display: none;
+}
+
+.pet-foto-imagem,
+.pet-foto-vazia {
+  width: 112px;
+  height: 112px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 3px solid #b77eff;
+}
+
+.pet-foto-imagem {
+  object-fit: cover;
+}
+
+.pet-foto-vazia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3ecff;
+  color: #8a3ffc;
+  font-size: 36px;
+  transition: background 0.2s;
+}
+
+.pet-foto-circulo:hover .pet-foto-vazia {
+  background: #e9dcff;
+}
+
+.pet-foto-texto {
+  color: #8a3ffc;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.animais-preview {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  align-self: center;
+  border: 2px solid #D9C4FA;
+}

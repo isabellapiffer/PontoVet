@@ -1,0 +1,91 @@
+:root {
+  --cor-1: rgb(227, 253, 253);
+  --cor-2: rgb(203, 241, 245);
+  --cor-3: rgb(166, 227, 233);
+  --cor-4: rgb(113, 201, 206);
+  --cor-5: rgb(0, 97, 153);
+  --cor-6: rgb(138, 207, 248);
+  /* Listas, calendários e caixinhas do navegador sempre no modo claro,
+     mesmo com o computador no modo escuro */
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: "Quicksand", sans-serif;
+}
+
+/* Esconde a barra de rolagem em todo o app (pensado para celular:
+   a pessoa arrasta a tela para descer). A rolagem continua funcionando. */
+* {
+  scrollbar-width: none; /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Edge, Safari */
+}
+
+/* Computador (tela maior que um celular): "moldura de celular".
+   O app fica numa coluna branca de 480px no meio, com fundo lilás dos lados
+   e uma sombra leve. No celular nada disso vale. */
+@media (min-width: 600px) {
+  body {
+    background: #f3ecff;
+  }
+
+  #root {
+    max-width: 480px;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: #ffffff;
+    box-shadow: 0 0 24px rgba(42, 31, 61, 0.18);
+  }
+
+  /* Partes presas na tela: em vez de ir de uma borda à outra do monitor,
+     ficam só na largura da coluna (240px = metade da coluna).
+     O "#root" na frente deixa estas regras mais fortes que as do CSS de
+     cada tela, que carrega depois deste arquivo. */
+  #root .menu-inferior,
+  #root .perfil-rodape,
+  #root .add-tela {
+    left: calc(50% - 240px);
+    right: calc(50% - 240px);
+  }
+
+  #root .gaveta {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Gavetas da Agenda (detalhes e "+"): no celular vão até 560px; aqui, só a coluna */
+  #root .agenda-gaveta {
+    max-width: 480px;
+  }
+
+  /* Botões e avisos presos na tela: 16 a 20px para dentro da coluna */
+  #root .agenda-botao-adicionar {
+    right: calc(50% - 240px + 20px);
+  }
+
+  #root .agenda-aviso {
+    max-width: 440px;
+  }
+
+  #root .animais-botao-cadastrar {
+    max-width: 448px;
+  }
+}
+
+/* Asterisco dos campos obrigatórios: discreto, ao lado da pergunta.
+   Fica aqui (CSS do app todo) porque aparece no cadastro do pet e nas telas de conta */
+.obrigatorio {
+  color: #b77eff;
+  font-weight: 600;
+}
+
+.obrigatorio-legenda {
+  margin: 0;
+  color: #6b5b8a;
+  font-size: 13px;
+  font-weight: 600;
+}

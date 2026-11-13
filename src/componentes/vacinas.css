@@ -1,0 +1,32 @@
+/* Botões das vacinas (mesmo estilo do Sim/Não), quebrando linha quando não cabem */
+.vacinas-opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Datas de cada vacina marcada */
+.vacinas-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #f0e8fb;
+}
+
+.vacinas-bloco strong {
+  font-size: 15px;
+  color: #2a1f3d;
+}
+
+.vacinas-bloco input:disabled {
+  background: #f3ecff;
+  color: #6b5b8a;
+}
+
+/* Data da próxima aplicação calculada pelo app */
+.vacinas-proxima {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a2a7a;
+}

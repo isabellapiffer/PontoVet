@@ -1,0 +1,159 @@
+.menu-superior {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-superior-foto {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 2px solid #b77eff;
+  border-radius: 50%;
+  background: #f3ecff;
+  color: #8a3ffc;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.menu-superior-textos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.menu-superior-sanduiche {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 12px;
+  color: #4a2a7a;
+  font-size: 28px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-superior-sanduiche:hover {
+  background: #f3ecff;
+}
+
+/* A caixinha que abre embaixo do sanduíche */
+
+.menu-superior-sanduiche-area {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.menu-superior-opcoes {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border: 1px solid #e6dcf7;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(42, 31, 61, 0.15);
+}
+
+.menu-superior-opcao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: #2a1f3d;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-superior-opcao svg {
+  flex-shrink: 0;
+  color: #8a3ffc;
+  font-size: 20px;
+}
+
+.menu-superior-opcao:hover {
+  background: #f3ecff;
+}
+
+/* "Sair da conta" separado das outras opções por uma linha */
+.menu-superior-sair {
+  margin-top: 4px;
+  border-top: 1px solid #e6dcf7;
+  border-radius: 0 0 12px 12px;
+}
+
+.menu-superior-ola {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.menu-superior-endereco {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #6b5b8a;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-superior-endereco span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.menu-superior-pino {
+  flex-shrink: 0;
+  color: #8a3ffc;
+  font-size: 16px;
+}
+
+.menu-superior-erro {
+  margin: 0;
+  font-size: 12px;
+  color: #c0392b;
+}
+
+/* Foto do tutor dentro do círculo do topo */
+.menu-superior-foto {
+  overflow: hidden;
+}
+
+.menu-superior-foto-imagem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -1,0 +1,334 @@
+.perfil-pet {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 16px 96px;
+  background: #ffffff;
+}
+
+.perfil-pet-titulo {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.perfil-pet-erro {
+  margin: 0;
+  color: #d43939;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Card do animal */
+
+/* Foto no topo, centralizada, e a descrição embaixo */
+.perfil-pet-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px 8px;
+  text-align: center;
+  border: 1px solid #e6dcf7;
+  border-radius: 16px;
+  background: #faf6ff;
+}
+
+/* Lápis no canto de cima, à direita do card */
+.perfil-pet-editar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  /* Fundo cinza bem justo em volta do ícone */
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: #e6e6ec; /* cinza um pouco mais escuro que o fundo do card */
+  color: #5f5f6e; /* cinza que dá para ver bem */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.perfil-pet-editar:hover {
+  background: #d9d9e1;
+}
+
+/* Foto redonda, como foto de perfil (igual à tela inicial) */
+.perfil-pet-foto {
+  width: 112px;
+  height: 112px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 3px solid #b77eff;
+  object-fit: cover;
+  background: #f3ecff;
+}
+
+.perfil-pet-foto-vazia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b77eff;
+  font-size: 36px;
+}
+
+.perfil-pet-dados {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.perfil-pet-nome {
+  margin: 0;
+  font-size: 18px; /* mesmo tamanho dos títulos dos cartões */
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.perfil-pet-especie {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+/* Sexo, Castrado, Idade...: nome à esquerda, valor à direita,
+   com uma linha fina em cima de cada um */
+.perfil-pet-lista {
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0 0;
+  text-align: left;
+}
+
+.perfil-pet-lista div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #e6dcf7;
+  font-size: 14px;
+}
+
+.perfil-pet-lista dt {
+  font-weight: 700;
+  color: #4a2a7a;
+  white-space: nowrap;
+}
+
+.perfil-pet-lista dd {
+  margin: 0;
+  font-weight: 500;
+  color: #2a1f3d;
+  text-align: right;
+}
+
+/* Próximos agendamentos e Histórico */
+
+/* Cada tópico (Histórico clínico, Próximos agendamentos) num cartão
+   com a mesma borda e o mesmo fundo do resumo do animal */
+.perfil-pet-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e6dcf7;
+  border-radius: 16px;
+  background: #faf6ff;
+}
+
+.perfil-pet-secao-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+/* Texto simples dentro do cartão (sem uma segunda caixa) */
+.perfil-pet-vazio {
+  margin: 0;
+  color: #6b5b8a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Histórico clínico informado pelo tutor */
+.perfil-pet-historico {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.perfil-pet-historico dt {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a2a7a;
+}
+
+.perfil-pet-historico dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #2a1f3d;
+  white-space: pre-line; /* mantém as quebras de linha das Observações */
+}
+
+/* Título da seção com o lápis ao lado (ex.: Histórico clínico) */
+.perfil-pet-secao-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Mesmo lápis do card, mas no lugar normal (não preso no canto) */
+.perfil-pet-editar.perfil-pet-editar-secao {
+  position: static;
+  flex-shrink: 0;
+}
+
+.perfil-pet-medicacoes {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Medicação embaixo da doença em tratamento: "Insulina · 2 UI, 2 vezes ao dia" */
+.perfil-pet-doenca-med {
+  display: block;
+  font-size: 14px;
+  color: #6b5b8a;
+}
+
+/* Título "Histórico clínico" clicável (abre e fecha a lista) */
+.perfil-pet-secao-abrir {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: #2a1f3d;
+  cursor: pointer;
+}
+
+.perfil-pet-secao-abrir svg {
+  font-size: 18px;
+  color: #6b5b8a;
+}
+
+/* Destaques do topo do histórico: "Em tratamento" (lilás) e "Próximos" (branco) */
+.perfil-pet-destaque {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #e6dcf7;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.perfil-pet-destaque-cheio {
+  border-color: #f3ecff;
+  background: #f3ecff;
+}
+
+.perfil-pet-destaque-titulo {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.perfil-pet-destaque-icone {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #8a3ffc;
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.perfil-pet-destaque-icone-claro {
+  background: #f3ecff;
+  color: #8a3ffc;
+}
+
+/* Cada remédio em uso, numa caixinha branca */
+.perfil-pet-destaque-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.perfil-pet-destaque-item strong,
+.perfil-pet-proximo-textos strong {
+  font-size: 15px;
+  color: #2a1f3d;
+}
+
+.perfil-pet-destaque-item span,
+.perfil-pet-proximo-textos span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+/* Próximos: a data num quadradinho ("12 NOV") e os textos ao lado */
+.perfil-pet-proximo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.perfil-pet-data {
+  flex-shrink: 0;
+  width: 48px;
+  padding: 6px 0;
+  border-radius: 10px;
+  background: #f3ecff;
+  color: #4a2a7a;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.perfil-pet-data-forte {
+  background: #8a3ffc;
+  color: #ffffff;
+}
+
+.perfil-pet-proximo-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}

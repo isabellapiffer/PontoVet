@@ -1,0 +1,25 @@
+.nao-encontrada-pagina {
+  width: 92%;
+  max-width: 480px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.nao-encontrada-icone {
+  font-size: 40px;
+  color: #B77EFF;
+}
+
+.nao-encontrada-titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2a1f3d;
+}

@@ -1,0 +1,9 @@
+.tela-inicial {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 16px 96px;
+  background: #ffffff;
+}

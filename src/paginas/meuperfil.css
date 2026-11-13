@@ -1,0 +1,31 @@
+.meu-perfil {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 16px 48px;
+  background: #ffffff;
+}
+
+.meu-perfil-titulo {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.meu-perfil .login-form input {
+  font-family: inherit;
+}
+
+.meu-perfil .login-form input:disabled {
+  background: #f5f2fa;
+  color: #6b5b8a;
+}
+
+.meu-perfil-salvo {
+  color: #2e9e4a;
+  font-size: 14px;
+  font-weight: 700;
+}

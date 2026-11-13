@@ -1,0 +1,167 @@
+/* Estilo da tela Buscar atendimento.
+   O ".tela-buscar" na frente faz estas regras valerem só aqui,
+   sem mudar o Mural antigo, que usa as mesmas classes. */
+
+.tela-buscar {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 16px 96px;
+  background: #ffffff;
+}
+
+.tela-buscar-titulo {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.tela-buscar-subtitulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.tela-buscar-resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Título dos resultados + "Limpar filtro" na mesma linha */
+.tela-buscar-resultados-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.botao-limpar-filtro {
+  min-height: 44px;
+  padding: 0 4px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: #8a3ffc;
+  cursor: pointer;
+}
+
+.botao-limpar-filtro:hover {
+  color: #4a2a7a;
+}
+
+/* Aviso quando não há veterinário na cidade buscada */
+.tela-buscar-aviso {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f3ecff;
+  color: #4a2a7a;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Faixa "dados fictícios": branca com borda, para não parecer parte do aviso
+   lilás de "cidade mais próxima" quando os dois aparecem juntos */
+.tela-buscar-aviso-fake {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e6dcf7;
+  background: #ffffff;
+  color: #6b5b8a;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Filtros: card lilás clarinho com campos brancos */
+
+.tela-buscar .buscar-barra {
+  width: 100%;
+  margin: 0;
+}
+
+.tela-buscar .painel-busca {
+  margin: 0;
+  padding: 16px;
+  gap: 14px;
+  border: 1px solid #e6dcf7;
+  border-radius: 16px;
+  background: #faf6ff;
+}
+
+.tela-buscar .painel-busca > * {
+  max-width: none;
+}
+
+.tela-buscar .painel-busca label {
+  color: #2a1f3d;
+  font-size: 14px;
+}
+
+.tela-buscar .painel-busca input,
+.tela-buscar .painel-busca .select-caixa {
+  height: 44px;
+  box-sizing: border-box;
+  border: 1px solid #e6dcf7;
+  border-radius: 12px;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.tela-buscar .icone-duvida {
+  color: #8a3ffc;
+}
+
+.tela-buscar .aviso-campo {
+  background: #f3ecff;
+  color: #4a2a7a;
+}
+
+.tela-buscar .botao-buscar {
+  min-height: 48px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+/* Resultados: cards brancos com borda lilás */
+
+.tela-buscar .lista-cards {
+  width: 100%;
+  margin: 0;
+}
+
+.tela-buscar .card {
+  border: 1px solid #e6dcf7;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.tela-buscar .foto-vet {
+  border-color: #b77eff;
+}
+
+.tela-buscar .conteudo h3 {
+  font-size: 16px;
+  color: #2a1f3d;
+}
+
+.tela-buscar .especialidade {
+  font-size: 13px;
+  color: #6b5b8a;
+}
+
+.tela-buscar .info-card {
+  font-size: 13px;
+  color: #8a3ffc;
+}

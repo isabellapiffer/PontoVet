@@ -1,0 +1,98 @@
+.lembretes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lembretes-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.lembretes-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lembretes-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 10px 10px;
+  border: 1px solid #e6dcf7;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.lembretes-abrir {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lembretes-icone {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #f3ecff;
+  color: #8a3ffc;
+  font-size: 22px;
+}
+
+.lembretes-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lembretes-textos strong {
+  font-size: 15px;
+  color: #2a1f3d;
+}
+
+.lembretes-textos span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+.lembretes-textos .lembretes-atrasado {
+  color: #c0392b;
+}
+
+.lembretes-feito {
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: #8a3ffc;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lembretes-feito:disabled {
+  opacity: 0.6;
+}

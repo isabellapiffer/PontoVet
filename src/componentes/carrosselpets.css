@@ -1,0 +1,103 @@
+.carrossel-pets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.carrossel-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.carrossel-lista {
+  display: flex;
+  gap: 12px;
+  margin-right: -16px;
+  padding-right: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.carrossel-lista::-webkit-scrollbar {
+  display: none;
+}
+
+.carrossel-card {
+  flex-shrink: 0;
+  width: 104px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+/* Foto redonda, como foto de perfil */
+.carrossel-foto {
+  width: 96px;
+  height: 96px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 3px solid #b77eff;
+  object-fit: cover;
+  background: #f3ecff;
+}
+
+.carrossel-foto-vazia,
+.carrossel-foto-adicionar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b77eff;
+  font-size: 36px;
+}
+
+.carrossel-foto-adicionar {
+  border: 2px dashed #b77eff;
+  background: #faf6ff;
+  color: #8a3ffc;
+  transition: background 0.2s;
+}
+
+.carrossel-card:hover .carrossel-foto-adicionar {
+  background: #f3ecff;
+}
+
+/* Enquanto os pets carregam: um card "fantasma" piscando devagar */
+
+.carrossel-carregando,
+.carrossel-nome-carregando {
+  background: #f3ecff;
+  animation: carrossel-piscar 1.2s ease-in-out infinite;
+}
+
+.carrossel-nome-carregando {
+  width: 80px;
+  height: 14px;
+  border-radius: 999px;
+}
+
+@keyframes carrossel-piscar {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.carrossel-nome {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2a1f3d;
+}

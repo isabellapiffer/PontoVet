@@ -1,0 +1,291 @@
+/* Perfil do veterinário (protótipo de 04/11/2026, "Perfil A") */
+
+.perfil-pagina {
+  width: 85%;
+  max-width: 480px;
+  margin: 0 auto;
+  /* espaço embaixo para o rodapé fixo não cobrir o fim da página */
+  padding: 16px 0 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  color: #2a1f3d;
+  text-align: left;
+}
+
+/* Faixa "Perfil fictício" (mesmo visual da faixa "dados fictícios" do Buscar) */
+.perfil-aviso-fake {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e6dcf7;
+  background: #ffffff;
+  color: #6b5b8a;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Foto e nome lado a lado */
+.perfil-topo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.perfil-foto {
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  object-fit: cover;
+  background: #f3ecff;
+  flex-shrink: 0;
+}
+
+/* Botão em volta da foto (clicar abre a foto grande) */
+.perfil-foto-botao {
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 24px;
+  cursor: zoom-in;
+  flex-shrink: 0;
+}
+
+/* Foto grande por cima de tudo */
+.foto-grande-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(42, 31, 61, 0.85);
+  cursor: zoom-out;
+}
+
+.foto-grande {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 20px;
+  object-fit: contain;
+  background: #f3ecff;
+}
+
+.foto-grande-fechar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.perfil-topo-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.perfil-nome {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.perfil-nota-linha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+.perfil-nota-linha i {
+  color: #8a3ffc;
+}
+
+.perfil-nota-linha b {
+  color: #2a1f3d;
+}
+
+/* Quadro com endereço e espécies */
+.perfil-quadro {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  border: 1px solid #e6dcf7;
+}
+
+.perfil-quadro-linha {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.perfil-quadro-linha + .perfil-quadro-linha {
+  border-top: 1px solid #f0e8fb;
+}
+
+.perfil-quadro-icone {
+  color: #8a3ffc;
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.perfil-quadro-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.perfil-rotulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b5b8a;
+}
+
+.perfil-valor {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.perfil-detalhe {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b5b8a;
+}
+
+.perfil-especies {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.perfil-especie {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #e6dcf7;
+  color: #4a2a7a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Sobre mim e Avaliações */
+.perfil-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.perfil-secao-titulo {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.perfil-texto {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #4a3d63;
+}
+
+.perfil-media {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avaliacao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #faf6ff;
+}
+
+.avaliacao-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.avaliacao-autor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
+
+.avaliacao-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e6dcf7;
+  flex-shrink: 0;
+}
+
+.avaliacao-nota {
+  align-self: center;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+/* Rodapé fixo com "Agendar" ou "Fazer login" */
+.perfil-rodape {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 24px;
+  background: #ffffff;
+  border-top: 1px solid #f0e8fb;
+  z-index: 50;
+}
+
+.perfil-rodape .botao-login {
+  max-width: 480px;
+  border-radius: 999px;
+  font-size: 17px;
+}
+
+.perfil-rodape-sem-login {
+  background: #f3ecff;
+  border-top: none;
+  border-radius: 24px 24px 0 0;
+}
+
+.perfil-rodape-texto {
+  margin: 0;
+  width: 85%;
+  max-width: 480px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #2a1f3d;
+}
