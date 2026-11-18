@@ -112,6 +112,40 @@
   font-size: 13px;
 }
 
+/* Cartão que aparece depois de criar a conta com e-mail */
+.conta-criada {
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  padding: 24px 20px;
+  background-color: white;
+  border: 1px solid #D9C4FA;
+  border-radius: 16px;
+  text-align: center;
+  color: #2A1F3D;
+}
+
+.conta-criada h2 {
+  margin: 0 0 12px;
+  color: #8A3FFC;
+}
+
+.conta-criada p {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.conta-criada strong {
+  color: #4A2A7A;
+  word-break: break-all;
+}
+
+.conta-criada .conta-criada-spam {
+  margin-top: 14px;
+  font-size: 14px;
+  color: #6B5B8A;
+}
+
 .dica-campo {
   color: #6B5B8A;
   font-size: 12px;

@@ -9,6 +9,7 @@ import {
   IoCalendar,
   IoCalendarOutline,
 } from "react-icons/io5";
+import { MOSTRAR_BUSCAR } from "../recursos.js";
 import "./menuinferior.css";
 
 export default function MenuInferior() {
@@ -43,17 +44,19 @@ export default function MenuInferior() {
         )}
         <span>Animais</span>
       </button>
-      <button
-        className={telaAberta === "/buscar" ? "menu-item menu-item-ativo" : "menu-item"}
-        onClick={() => navigate("/buscar")}
-      >
-        {telaAberta === "/buscar" ? (
-          <IoSearch className="menu-icon" />
-        ) : (
-          <IoSearchOutline className="menu-icon" />
-        )}
-        <span>Buscar</span>
-      </button>
+      {MOSTRAR_BUSCAR && (
+        <button
+          className={telaAberta === "/buscar" ? "menu-item menu-item-ativo" : "menu-item"}
+          onClick={() => navigate("/buscar")}
+        >
+          {telaAberta === "/buscar" ? (
+            <IoSearch className="menu-icon" />
+          ) : (
+            <IoSearchOutline className="menu-icon" />
+          )}
+          <span>Buscar</span>
+        </button>
+      )}
       <button
         className={telaAberta === "/agenda" ? "menu-item menu-item-ativo" : "menu-item"}
         onClick={() => navigate("/agenda")}

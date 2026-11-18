@@ -2,10 +2,11 @@
 // Rodar: npm run e2e
 import { test, expect } from "@playwright/test";
 import { usarSupabaseFalso, DADOS_ANA } from "./supabaseFalso.js";
+import { MOSTRAR_BUSCAR } from "../src/recursos.js";
 
 const telas = [
   { endereco: "/", ativo: "Início" },
-  { endereco: "/buscar", ativo: "Buscar" },
+  ...(MOSTRAR_BUSCAR ? [{ endereco: "/buscar", ativo: "Buscar" }] : []),
   { endereco: "/meus-animais", ativo: "Animais" },
   { endereco: "/pet/pet-luna", ativo: "Animais" },
   { endereco: "/agenda", ativo: "Agenda" },

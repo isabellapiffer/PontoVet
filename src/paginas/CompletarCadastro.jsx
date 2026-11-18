@@ -14,6 +14,8 @@ import {
   paraDataISO,
   validarData,
   camposVazios,
+  requisitosSenha,
+  validarSenha,
 } from "../formatadores.js";
 import "./Mural.jsx/mural.css";
 import "./login.css";
@@ -21,6 +23,11 @@ import "./login.css";
 export default function CompletarCadastro() {
   const [passo, setPasso] = useState("carregando");
   const [usuario, setUsuario] = useState(null);
+
+  const [senha, setSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
 
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
@@ -75,8 +82,13 @@ export default function CompletarCadastro() {
     pais: endereco.pais,
   };
 
+  // Quem entrou pelo Google ainda não tem senha (não tem "email" nos providers).
+  // Pedimos uma aqui para a pessoa também poder entrar com e-mail e senha.
+  const precisaSenha = !usuario?.app_metadata?.providers?.includes("email");
+
   // Campos obrigatórios do tutor
   const vaziosTutor = camposVazios({
+    ...(precisaSenha ? { senha, confirmarSenha } : {}),
     nome,
     sobrenome,
     cpf,
@@ -143,13 +155,34 @@ export default function CompletarCadastro() {
         return;
       }
 
-      if (categoriaPreDefinida === "tutor") {
-        setPasso("formTutor");
-      } else if (categoriaPreDefinida === "profissional") {
-        setTipoProfissional(tipoPreDefinido);
+      // Quem criou a conta com e-mail tem o formulário guardado na conta
+      // (user_metadata). Salva agora e apaga a cópia guardada.
+      // Ex.: user_metadata = { tutor: { nome: "Bia", cpf: "123.456.789-09", ... } }
+      const guardado = data.user.user_metadata || {};
+      const tabela = guardado.tutor ? "tutores" : guardado.profissional ? "profissionais" : null;
+
+      if (tabela) {
+        const chave = guardado.tutor ? "tutor" : "profissional";
+        const { error } = await supabase
+          .from(tabela)
+          .insert({ id: data.user.id, ...guardado[chave] });
+
+        if (!error) {
+          await supabase.auth.updateUser({ data: { [chave]: null } });
+          navigate(voltarPara);
+          return;
+        }
+
+        // Deu erro (ex.: CPF já usado por outra conta): mostra o formulário com o aviso
+        setErro(mensagemDeErro(error));
+      }
+
+      if (categoriaPreDefinida === "profissional" || guardado.profissional) {
+        setTipoProfissional(tipoPreDefinido || guardado.profissional.tipo);
         setPasso("formProfissional");
       } else {
-        setPasso("categoria");
+        // Por enquanto vai direto para o tutor (sem "Sou tutor / Sou profissional")
+        setPasso("formTutor");
       }
     }
 
@@ -205,6 +238,16 @@ export default function CompletarCadastro() {
       return;
     }
 
+    if (precisaSenha && !validarSenha(senha)) {
+      setErro("A senha não atende aos requisitos mínimos.");
+      return;
+    }
+
+    if (precisaSenha && senha !== confirmarSenha) {
+      setErro("As senhas não coincidem.");
+      return;
+    }
+
     if (cpfExiste) {
       setErro("Esse CPF já está cadastrado.");
       return;
@@ -218,6 +261,17 @@ export default function CompletarCadastro() {
 
     // Os campos estão certos: agora sim o botão fica desativado
     setEnviando(true);
+
+    if (precisaSenha) {
+      const { error: erroSenha } = await supabase.auth.updateUser({
+        password: senha,
+      });
+      if (erroSenha) {
+        setErro(mensagemDeErro(erroSenha));
+        setEnviando(false);
+        return;
+      }
+    }
 
     const { error } = await supabase.from("tutores").insert({
       id: usuario.id,
@@ -324,7 +378,7 @@ export default function CompletarCadastro() {
 
   return (
     <div className="login-pagina">
-      {passo !== "categoria" && (
+      {passo !== "categoria" && passo !== "formTutor" && (
         <div className="topo-com-voltar">
           <BotaoVoltar aoClicar={voltar} />
         </div>
@@ -371,6 +425,85 @@ export default function CompletarCadastro() {
           <p className="obrigatorio-legenda">
             <span className="obrigatorio">*</span> Campos obrigatórios
           </p>
+
+          {precisaSenha && (
+            <>
+              <label>
+                <span>
+                  Senha <span className="obrigatorio">*</span>
+                </span>
+                <div className="campo-senha">
+                  <input
+                    type={mostrarSenha ? "text" : "password"}
+                    placeholder="Crie uma senha"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    className={
+                      senha.length === 0
+                        ? borda("senha")
+                        : validarSenha(senha)
+                        ? "campo-valido"
+                        : "campo-invalido"
+                    }
+                  />
+                  <i
+                    className={`fa-solid ${
+                      mostrarSenha ? "fa-eye-slash" : "fa-eye"
+                    } icone-olho`}
+                    onClick={() => setMostrarSenha(!mostrarSenha)}
+                  ></i>
+                </div>
+                {senha.length > 0 && (
+                  <div className="requisitos-senha">
+                    {requisitosSenha(senha).map((requisito) => (
+                      <span
+                        key={requisito.texto}
+                        className={
+                          requisito.ok ? "requisito-ok" : "requisito-erro"
+                        }
+                      >
+                        {requisito.texto}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </label>
+
+              <label>
+                <span>
+                  Confirmar senha <span className="obrigatorio">*</span>
+                </span>
+                <div className="campo-senha">
+                  <input
+                    type={mostrarConfirmarSenha ? "text" : "password"}
+                    placeholder="Repita a senha"
+                    value={confirmarSenha}
+                    onChange={(e) => setConfirmarSenha(e.target.value)}
+                    className={
+                      confirmarSenha.length === 0
+                        ? borda("confirmarSenha")
+                        : confirmarSenha === senha
+                        ? "campo-valido"
+                        : "campo-invalido"
+                    }
+                  />
+                  <i
+                    className={`fa-solid ${
+                      mostrarConfirmarSenha ? "fa-eye-slash" : "fa-eye"
+                    } icone-olho`}
+                    onClick={() =>
+                      setMostrarConfirmarSenha(!mostrarConfirmarSenha)
+                    }
+                  ></i>
+                </div>
+                {confirmarSenha.length > 0 && confirmarSenha !== senha && (
+                  <span className="requisito-erro">
+                    A senha digitada deve ser a mesma.
+                  </span>
+                )}
+              </label>
+            </>
+          )}
 
           <h3 className="login-secao-titulo">Dados pessoais</h3>
 

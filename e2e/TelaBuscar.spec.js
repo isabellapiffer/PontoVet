@@ -2,6 +2,9 @@
 // Rodar: npm run e2e
 import { test, expect } from "@playwright/test";
 import { usarSupabaseFalso, DADOS_ANA } from "./supabaseFalso.js";
+import { MOSTRAR_BUSCAR } from "../src/recursos.js";
+
+test.skip(!MOSTRAR_BUSCAR, "O Buscar está escondido em src/recursos.js");
 
 test.beforeEach(async ({ page }) => {
   await usarSupabaseFalso(page, DADOS_ANA);

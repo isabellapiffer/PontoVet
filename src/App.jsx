@@ -11,6 +11,7 @@ import MeuPerfil from "./paginas/MeuPerfil.jsx";
 import PerfilPet from "./paginas/PerfilPet.jsx";
 import PaginaNaoEncontrada from "./paginas/PaginaNaoEncontrada.jsx";
 import Agenda from "./paginas/Agenda.jsx";
+import { MOSTRAR_BUSCAR } from "./recursos.js";
 
 export default function App() {
   const [mostrarSplash, setMostrarSplash] = useState(true);
@@ -25,7 +26,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<TelaInicial />} />
-      <Route path="/buscar" element={<TelaBuscar />} />
+      {MOSTRAR_BUSCAR && <Route path="/buscar" element={<TelaBuscar />} />}
       <Route path="/meu-perfil" element={<MeuPerfil />} />
       <Route path="/pet/:id" element={<PerfilPet />} />
       <Route path="/profissional/:id" element={<Perfil />} />

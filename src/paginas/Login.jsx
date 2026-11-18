@@ -21,6 +21,9 @@ import {
 import "./Mural.jsx/mural.css";
 import "./login.css";
 
+const AVISO_EMAIL_JA_CADASTRADO =
+  "Já existe uma conta com este e-mail. Volte e entre por ela. Se você criou a conta pelo Google, use Entrar com Google.";
+
 export default function Login() {
   const [passo, setPasso] = useState("entrar");
 
@@ -30,6 +33,7 @@ export default function Login() {
   const [erroEntrar, setErroEntrar] = useState("");
 
   const [email, setEmail] = useState("");
+  const [emailExiste, setEmailExiste] = useState(false);
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [confirmarSenha, setConfirmarSenha] = useState("");
@@ -158,7 +162,9 @@ export default function Login() {
 
     if (passo === "categoria") setPasso("entrar");
     if (passo === "tipoProfissional") setPasso("categoria");
-    if (passo === "formTutor") setPasso("categoria");
+    // Por enquanto o "Criar conta" vai direto para o tutor (sem "Sou tutor / Sou profissional")
+    if (passo === "formTutor") setPasso("entrar");
+    if (passo === "confirmeEmail") setPasso("entrar");
     if (passo === "formProfissional") setPasso("tipoProfissional");
   }
 
@@ -203,6 +209,13 @@ export default function Login() {
     });
   }
 
+  async function verificarEmail() {
+    if (!email) return;
+
+    const { data } = await supabase.rpc("email_existe", { email_busca: email });
+    setEmailExiste(Boolean(data));
+  }
+
   async function verificarCpf() {
     if (!cpf) return;
 
@@ -232,6 +245,11 @@ export default function Login() {
       return;
     }
 
+    if (emailExiste) {
+      setErroCadastro(AVISO_EMAIL_JA_CADASTRADO);
+      return;
+    }
+
     if (cpfExiste) {
       setErroCadastro("Esse CPF já está cadastrado.");
       return;
@@ -246,9 +264,31 @@ export default function Login() {
     // Os campos estão certos: agora sim o botão fica desativado
     setEnviando(true);
 
+    // Os dados do formulário vão guardados na conta (user_metadata). Quem salva
+    // em "tutores" é a tela Completar cadastro, quando a pessoa já tem sessão.
     const { data, error } = await supabase.auth.signUp({
       email,
       password: senha,
+      options: {
+        data: {
+          tutor: {
+            nome,
+            sobrenome,
+            cpf,
+            data_nascimento: paraDataISO(dataNascimento),
+            sexo,
+            cep,
+            rua: endereco.rua,
+            numero: endereco.numero,
+            complemento: endereco.complemento,
+            cidade: endereco.cidade,
+            estado: endereco.estado,
+            pais: endereco.pais,
+          },
+        },
+        emailRedirectTo:
+          window.location.origin + linkCompletarCadastro(voltarPara),
+      },
     });
 
     if (error) {
@@ -257,29 +297,22 @@ export default function Login() {
       return;
     }
 
-    const { error: erroTutor } = await supabase.from("tutores").insert({
-      id: data.user.id,
-      nome,
-      sobrenome,
-      cpf,
-      data_nascimento: paraDataISO(dataNascimento),
-      sexo,
-      cep,
-      rua: endereco.rua,
-      numero: endereco.numero,
-      complemento: endereco.complemento,
-      cidade: endereco.cidade,
-      estado: endereco.estado,
-      pais: endereco.pais,
-    });
-
-    if (erroTutor) {
-      setErroCadastro(mensagemDeErro(erroTutor));
+    // E-mail que já tem conta: o Supabase não dá erro (para não revelar quem
+    // tem conta), mas devolve "identities" vazio
+    if (data.user?.identities?.length === 0) {
+      setErroCadastro(AVISO_EMAIL_JA_CADASTRADO);
       setEnviando(false);
       return;
     }
 
-    navigate(voltarPara);
+    // Sem sessão = falta confirmar o e-mail. O link do e-mail termina o cadastro.
+    if (!data.session) {
+      setEnviando(false);
+      setPasso("confirmeEmail");
+      return;
+    }
+
+    navigate(linkCompletarCadastro(voltarPara));
   }
 
   async function verificarCrmv(ufEscolhida) {
@@ -343,9 +376,15 @@ export default function Login() {
     // Os campos estão certos: agora sim o botão fica desativado
     setEnviando(true);
 
+    // Mesmo jeito do tutor: os dados ficam guardados na conta até a confirmação
     const { data, error } = await supabase.auth.signUp({
       email: emailProf,
       password: senhaProf,
+      options: {
+        data: { profissional: dadosProfissional() },
+        emailRedirectTo:
+          window.location.origin + linkCompletarCadastro(voltarPara),
+      },
     });
 
     if (error) {
@@ -354,8 +393,23 @@ export default function Login() {
       return;
     }
 
-    const { error: erroProf } = await supabase.from("profissionais").insert({
-      id: data.user.id,
+    if (data.user?.identities?.length === 0) {
+      setErroCadastroProf(AVISO_EMAIL_JA_CADASTRADO);
+      setEnviando(false);
+      return;
+    }
+
+    if (!data.session) {
+      setEnviando(false);
+      setPasso("confirmeEmail");
+      return;
+    }
+
+    navigate(linkCompletarCadastro(voltarPara));
+  }
+
+  function dadosProfissional() {
+    return {
       tipo: tipoProfissional,
       nome_completo: nomeCompleto,
       crmv,
@@ -380,15 +434,7 @@ export default function Login() {
       cidade: enderecoProf.cidade,
       estado: enderecoProf.estado,
       pais: enderecoProf.pais,
-    });
-
-    if (erroProf) {
-      setErroCadastroProf(mensagemDeErro(erroProf));
-      setEnviando(false);
-      return;
-    }
-
-    navigate(voltarPara);
+    };
   }
 
   return (
@@ -445,10 +491,23 @@ export default function Login() {
 
           <button
             className="botao-criar-conta"
-            onClick={() => setPasso("categoria")}
+            onClick={() => setPasso("formTutor")}
           >
             Criar conta
           </button>
+        </div>
+      )}
+
+      {passo === "confirmeEmail" && (
+        <div className="conta-criada">
+          <h2>Conta criada!</h2>
+          <p>
+            Enviamos um link para <strong>{email || emailProf}</strong>.
+          </p>
+          <p>Clique nele para entrar no PontoVet.</p>
+          <p className="conta-criada-spam">
+            Não chegou? Confira também a pasta de spam.
+          </p>
         </div>
       )}
 
@@ -504,9 +563,16 @@ export default function Login() {
               type="email"
               placeholder="seuemail@exemplo.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={bordaTutor("email")}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailExiste(false);
+              }}
+              onBlur={verificarEmail}
+              className={emailExiste ? "campo-invalido" : bordaTutor("email")}
             />
+            {emailExiste && (
+              <span className="aviso-cpf">{AVISO_EMAIL_JA_CADASTRADO}</span>
+            )}
           </label>
 
           <label>

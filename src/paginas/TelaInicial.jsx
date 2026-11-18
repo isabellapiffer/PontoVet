@@ -4,6 +4,7 @@ import { supabase } from "../supabaseClient.js";
 import { temCadastro, linkCompletarCadastro } from "../perfil.js";
 import MenuSuperior from "../componentes/MenuSuperior.jsx";
 import BuscarAtendimento from "../componentes/BuscarAtendimento.jsx";
+import { MOSTRAR_BUSCAR } from "../recursos.js";
 import CarrosselPets from "../componentes/CarrosselPets.jsx";
 import ProximosAgendamentos from "../componentes/ProximosAgendamentos.jsx";
 import Lembretes from "../componentes/Lembretes.jsx";
@@ -104,7 +105,7 @@ export default function TelaInicial() {
   return (
     <div className="tela-inicial">
       <MenuSuperior nome={tutor?.nome} endereco={endereco} foto={tutor?.foto_url} />
-      <BuscarAtendimento />
+      {MOSTRAR_BUSCAR && <BuscarAtendimento />}
       <CarrosselPets pets={pets} carregando={carregando} />
       <Lembretes
         // Os avisos do preparo de exame entram junto, depois dos outros lembretes
