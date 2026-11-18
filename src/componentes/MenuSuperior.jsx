@@ -8,9 +8,17 @@ import {
   IoPersonOutline,
   IoSettingsOutline,
   IoLogOutOutline,
+  IoDownloadOutline,
 } from "react-icons/io5";
 import { supabase } from "../supabaseClient.js";
+import {
+  podeInstalar,
+  ehIphone,
+  abrirJanelaDeInstalacao,
+  aoMudarInstalacao,
+} from "../instalarApp.js";
 import GavetaEndereco from "./GavetaEndereco.jsx";
+import GavetaInstalar from "./GavetaInstalar.jsx";
 import "./menusuperior.css";
 
 export default function MenuSuperior({ nome, endereco, foto }) {
@@ -24,7 +32,18 @@ export default function MenuSuperior({ nome, endereco, foto }) {
   });
   const [gavetaAberta, setGavetaAberta] = useState(false);
   const [menuAberto, setMenuAberto] = useState(false);
+  const [mostrarInstalar, setMostrarInstalar] = useState(podeInstalar);
+  const [gavetaInstalarAberta, setGavetaInstalarAberta] = useState(false);
   const menuRef = useRef(null);
+
+  // O aviso do Chrome pode chegar depois que a tela abriu
+  useEffect(() => aoMudarInstalacao(() => setMostrarInstalar(podeInstalar())), []);
+
+  function instalarApp() {
+    setMenuAberto(false);
+    if (ehIphone()) setGavetaInstalarAberta(true);
+    else abrirJanelaDeInstalacao();
+  }
 
   useEffect(() => {
     function aoClicarFora(evento) {
@@ -106,6 +125,12 @@ export default function MenuSuperior({ nome, endereco, foto }) {
               <IoPersonOutline />
               <span>Meu perfil</span>
             </button>
+            {mostrarInstalar && (
+              <button className="menu-superior-opcao" onClick={instalarApp}>
+                <IoDownloadOutline />
+                <span>Instalar App</span>
+              </button>
+            )}
             <button className="menu-superior-opcao">
               <IoSettingsOutline />
               <span>Configurações</span>
@@ -127,6 +152,10 @@ export default function MenuSuperior({ nome, endereco, foto }) {
           aoConfirmar={confirmarEndereco}
           aoFechar={() => setGavetaAberta(false)}
         />
+      )}
+
+      {gavetaInstalarAberta && (
+        <GavetaInstalar aoFechar={() => setGavetaInstalarAberta(false)} />
       )}
     </header>
   );

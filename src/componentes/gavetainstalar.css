@@ -1,0 +1,17 @@
+.gaveta-instalar-passos {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--texto, #2a1f3d); /* #2a1f3d enquanto as variáveis de cor não forem commitadas */
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Ícone de compartilhar do Safari, no azul do iPhone para a pessoa reconhecer */
+.gaveta-instalar-icone {
+  vertical-align: -3px;
+  color: #2f6ef5;
+  font-size: 18px;
+}
