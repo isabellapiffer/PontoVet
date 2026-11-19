@@ -350,3 +350,30 @@
   background: #c9a6ff;
   cursor: not-allowed;
 }
+
+/* Telas de editar: "Apagar" embaixo do "Salvar alterações" (o rodapé vira coluna) */
+.add-rodape:has(.add-apagar) {
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-apagar {
+  width: 100%;
+  max-width: 520px;
+  min-height: 48px;
+  border-radius: 999px;
+  border: 2px solid #b3261e;
+  background: #ffffff;
+  color: #b3261e;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.add-apagar:disabled {
+  border-color: #e0a9a5;
+  color: #e0a9a5;
+  cursor: not-allowed;
+}

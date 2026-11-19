@@ -57,6 +57,11 @@
   font-size: 13px;
   text-align: center;
   cursor: pointer;
+  /* É um botão, mas com cara de link */
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
 }
 
 .botao-criar-conta {

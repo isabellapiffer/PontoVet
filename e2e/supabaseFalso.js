@@ -6,7 +6,7 @@ export const TUTORA = { id: "tutora-1", email: "ana@teste.com" };
 
 // Sessão de login guardada no navegador, como o Supabase faz depois que a pessoa entra.
 // O app lê daqui e acha que a Ana está logada.
-function sessaoFalsa() {
+export function sessaoFalsa() {
   const umAno = 60 * 60 * 24 * 365;
   const expira = Math.floor(Date.now() / 1000) + umAno;
   const base64 = (objeto) => Buffer.from(JSON.stringify(objeto)).toString("base64url");

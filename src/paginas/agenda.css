@@ -423,6 +423,16 @@
   background: #f3ecff;
 }
 
+/* Lápis e X lado a lado no topo da gaveta */
+.agenda-gaveta-acoes {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.agenda-gaveta-acoes .fa-pen {
+  font-size: 18px;
+}
+
 .agenda-gaveta-dados {
   margin: 0;
   display: flex;
@@ -488,18 +498,6 @@
 .agenda-gaveta-botao:disabled {
   background: #c9a6ff;
   cursor: not-allowed;
-}
-
-.agenda-gaveta-botao-excluir {
-  border: 2px solid #b3261e;
-  background: #ffffff;
-  color: #b3261e;
-}
-
-.agenda-gaveta-botao-excluir:disabled {
-  border-color: #e0a9a5;
-  background: #ffffff;
-  color: #e0a9a5;
 }
 
 .agenda-gaveta-botao-contorno {

@@ -5,8 +5,15 @@ import TelaAdicionar, { EscolherPet, Alternador, Escolhas } from "./TelaAdiciona
 import NovoRemedio from "./NovoRemedio.jsx";
 import NovoExame from "./NovoExame.jsx";
 import { supabase } from "../supabaseClient.js";
-import { validarData, paraDataISO, deDataISO } from "../formatadores.js";
-import { VACINAS_POR_ESPECIE, VACINAS_OUTRAS_ESPECIES, nomeDaVacina } from "../vacinas.js";
+import { paraDataISO, deDataISO } from "../formatadores.js";
+import { hojeISO, erroDataAgendada } from "../lembretes.js";
+import {
+  VACINAS_POR_ESPECIE,
+  VACINAS_OUTRAS_ESPECIES,
+  nomeDaVacina,
+  alternarVacina,
+  tituloDasVacinas,
+} from "../vacinas.js";
 // Estilos dos campos reaproveitados do formulário de vacina do pet
 import "./historicoclinico.css";
 import "./medicacoes.css";
@@ -15,16 +22,16 @@ import "../paginas/login.css";
 import "./adicionarnaagenda.css";
 
 // "+" da Agenda (protótipos de 04/11 e 05/11/2026):
-// 1) gaveta "O que você quer adicionar?" com Vacina, Remédio, Consulta, Exame e Outros
+// 1) gaveta "O que você quer adicionar?" com Vacina, Medicamentos, Consulta, Exame e Outros
 // 2) o formulário do tipo escolhido, numa tela por cima da Agenda
 // O que é AGENDADO vai para a tabela compromissos e aparece na Agenda.
 // O que já ACONTECEU (vacina aplicada, remédio, exame feito) vai para o
 // histórico do pet; a Agenda mostra o aviso "Salvo no histórico do ...".
-// Remédio e Exame têm o formulário em arquivos próprios (NovoRemedio, NovoExame).
+// Medicamentos e Exame têm o formulário em arquivos próprios (NovoRemedio, NovoExame).
 
 const TIPOS = [
   { id: "vacina", nome: "Vacina", icone: "fa-syringe" },
-  { id: "remedio", nome: "Remédio", icone: "fa-pills" },
+  { id: "remedio", nome: "Medicamentos", icone: "fa-pills" },
   { id: "consulta", nome: "Consulta", icone: "fa-stethoscope" },
   { id: "exame", nome: "Exame", icone: "fa-vial" },
   { id: "outro", nome: "Outros", icone: "fa-clipboard-list" },
@@ -55,9 +62,12 @@ export default function AdicionarNaAgenda({
   const [petId, setPetId] = useState(petInicial || (pets.length === 1 ? pets[0].id : null));
   // Vacina: "registrar" (já aplicada) ou "agendar" (vai ser aplicada)
   const [modoVacina, setModoVacina] = useState("agendar");
-  const [vacina, setVacina] = useState("");
+  // Vacinas marcadas no "Agendar aplicação" (várias juntas, ex.: ["V10 (polivalente)", "Raiva"])
+  const [vacinas, setVacinas] = useState([]);
   const [oQueE, setOQueE] = useState("");
-  const [data, setData] = useState(deDataISO(diaInicial));
+  // Dia escolhido na Agenda já passou: a data começa com hoje (não dá para agendar no passado)
+  const diaPadrao = diaInicial < hojeISO() ? hojeISO() : diaInicial;
+  const [data, setData] = useState(deDataISO(diaPadrao));
   const [hora, setHora] = useState("");
   const [local, setLocal] = useState("");
   const [observacao, setObservacao] = useState("");
@@ -141,7 +151,7 @@ export default function AdicionarNaAgenda({
       setErro("Escolha o pet.");
       return;
     }
-    if (tipo === "vacina" && !vacina) {
+    if (tipo === "vacina" && !vacinas.length) {
       setErro("Escolha a vacina.");
       return;
     }
@@ -149,14 +159,14 @@ export default function AdicionarNaAgenda({
       setErro("Preencha o que gostaria de agendar.");
       return;
     }
-    const erroData = validarData(data);
+    const erroData = erroDataAgendada(data);
     if (erroData) {
       setErro(erroData);
       return;
     }
 
     let titulo = "Consulta";
-    if (tipo === "vacina") titulo = `Vacina ${nomeDaVacina(vacina)}`;
+    if (tipo === "vacina") titulo = tituloDasVacinas(vacinas.map(nomeDaVacina));
     if (tipo === "outro") titulo = oQueE.trim();
 
     setSalvando(true);
@@ -225,13 +235,13 @@ export default function AdicionarNaAgenda({
   }
 
   // ---------- 2) Formulário do tipo escolhido ----------
-  // Remédio e Exame: formulários próprios. O pet escolhido continua aqui, para
+  // Medicamentos e Exame: formulários próprios. O pet escolhido continua aqui, para
   // não se perder ao voltar e escolher outro tipo
   const propsFormulario = {
     pets,
     petId,
     aoEscolherPet: setPetId,
-    diaInicial,
+    diaInicial: diaPadrao,
     aoVoltar: () => setTipo(null),
     salvarNoPet,
     salvarNaAgenda,
@@ -261,7 +271,7 @@ export default function AdicionarNaAgenda({
         petId={petId}
         aoEscolher={(id) => {
           setPetId(id);
-          setVacina(""); // as vacinas mudam conforme a espécie
+          setVacinas([]); // as vacinas mudam conforme a espécie
         }}
       />
 
@@ -291,14 +301,18 @@ export default function AdicionarNaAgenda({
         )
       )}
 
-      {/* Agendar aplicação: escolhe UMA vacina */}
+      {/* Agendar aplicação: uma ou várias vacinas (V10 OU V8; as outras com qualquer uma) */}
       {tipo === "vacina" && modoVacina === "agendar" && (
         <div className="add-campo">
           <span className="add-rotulo">
-            Qual vacina? <span className="obrigatorio">*</span>
+            Quais vacinas? <span className="obrigatorio">*</span>
           </span>
           {pet ? (
-            <Escolhas opcoes={opcoesVacina} valor={vacina} aoEscolher={setVacina} />
+            <Escolhas
+              opcoes={opcoesVacina}
+              valor={vacinas}
+              aoEscolher={(opcao) => setVacinas(alternarVacina(vacinas, opcao, pet.especie))}
+            />
           ) : (
             <p className="add-dica">Escolha o pet para ver as vacinas.</p>
           )}

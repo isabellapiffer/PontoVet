@@ -3,7 +3,7 @@ import TelaAdicionar, { EscolherPet, Alternador, Escolhas } from "./TelaAdiciona
 import { SimNao } from "./HistoricoClinico.jsx";
 import CampoData from "./CampoData.jsx";
 import { validarData, paraDataISO, deDataISO } from "../formatadores.js";
-import { hojeISO, horariosDoPreparo } from "../lembretes.js";
+import { hojeISO, horariosDoPreparo, erroDataAgendada } from "../lembretes.js";
 import { TIPOS_EXAME } from "../exames.js";
 import "./historicoclinico.css";
 import "./medicacoes.css";
@@ -82,7 +82,8 @@ export default function NovoExame({
     if (tipoExame === "Outro" && !nomeOutro.trim()) return "Escreva o nome do exame.";
 
     const data = modo === "registrar" ? dataFeito : dataAgendada;
-    const erroData = validarData(data);
+    // Agendar: só de hoje para frente
+    const erroData = modo === "registrar" ? validarData(data) : erroDataAgendada(data);
     if (erroData) return erroData;
     if (modo === "registrar" && paraDataISO(data) > hojeISO()) {
       return "A data do exame não pode ser no futuro.";

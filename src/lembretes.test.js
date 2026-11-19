@@ -22,6 +22,11 @@ import {
   quandoEOnde,
   nomeDoTipo,
   itensDosCompromissos,
+  trocarRegistro,
+  repetirDaProxima,
+  dataCurta,
+  erroDataAgendada,
+  historicoDaAgenda,
 } from "./lembretes.js";
 
 // "Hoje" fixo: 24/10/2026 (o dia do exemplo do TESTES.md)
@@ -244,6 +249,153 @@ describe("lembretesDeHoje", () => {
       { id: 2, nome: "Thor", vacinas: [{ produto: "V10", data: "2026-01-01", proxima: "2026-10-10" }] },
     ];
     expect(lembretesDeHoje(pets).map((l) => l.pet.nome)).toEqual(["Thor", "Hanna"]);
+  });
+});
+
+describe("lembretesDoPet: de onde veio o lembrete (para o lápis e a lixeira)", () => {
+  const hanna = { id: 7, nome: "Hanna" };
+
+  it("vermífugo: guarda a coluna e o registro do histórico", () => {
+    const registro = { produto: "Vetmax", data: "2026-11-09", proxima: "2026-12-09" };
+    const [lembrete] = lembretesDoPet({ ...hanna, vermifugacoes: [registro] });
+    expect(lembrete.historico).toEqual({ coluna: "vermifugacoes", registro });
+  });
+
+  it("vacina e antipulgas também", () => {
+    const vacina = { produto: "V10", data: "2026-10-24", proxima: "2027-10-24" };
+    const antipulgas = { produto: "NexGard", data: "2026-10-10", proxima: "2026-11-10" };
+    const lembretes = lembretesDoPet({ ...hanna, vacinas: [vacina], antiparasitarios: [antipulgas] });
+    expect(lembretes.map((l) => l.historico)).toEqual([
+      { coluna: "antiparasitarios", registro: antipulgas },
+      { coluna: "vacinas", registro: vacina },
+    ]);
+  });
+
+  it("remédio contínuo não tem (a data vem da última dose + intervalo)", () => {
+    const pet = {
+      ...hanna,
+      medicacoes: [{ nome: "Librela", intervalo: "1", intervaloTempo: "mes", ultimaDose: "2026-09-24" }],
+    };
+    expect(lembretesDoPet(pet)[0].historico).toBeUndefined();
+  });
+});
+
+describe("trocarRegistro", () => {
+  const lista = [
+    { produto: "Drontal", data: "2026-05-01", proxima: "2026-08-01" },
+    { produto: "Vetmax", data: "2026-11-09", proxima: "2026-12-09", autor: "tutor" },
+  ];
+
+  it("lápis: muda só o registro certo, com o que foi alterado", () => {
+    expect(trocarRegistro(lista, lista[1], { dose: "1", proxima: "2026-12-20" })).toEqual([
+      lista[0],
+      { produto: "Vetmax", data: "2026-11-09", proxima: "2026-12-20", autor: "tutor", dose: "1" },
+    ]);
+  });
+
+  it("apagar lembrete: próxima dose null tira o lembrete, e o registro continua", () => {
+    expect(trocarRegistro(lista, lista[1], { proxima: null })[1]).toEqual({
+      produto: "Vetmax",
+      data: "2026-11-09",
+      proxima: null,
+      autor: "tutor",
+    });
+  });
+
+  it("acha o registro pelo produto e pela data (a lista do banco é uma cópia nova)", () => {
+    const doBanco = lista.map((r) => ({ ...r }));
+    expect(trocarRegistro(doBanco, lista[1], { proxima: null })[1].proxima).toBeNull();
+  });
+});
+
+describe("historicoDaAgenda", () => {
+  const pet = { id: "p1", nome: "Hanna" };
+  const item = (id, data, extra = {}) => ({ id, data, hora: "", pet, compromisso: { id }, ...extra });
+
+  it("só agendamentos que já passaram, do mais recente para o mais antigo", () => {
+    const itens = [
+      item("a", "2026-10-01"),
+      item("b", "2026-11-17"),
+      item("c", "2026-11-18"), // hoje: não é histórico
+      item("d", "2026-12-01"),
+    ];
+    expect(historicoDaAgenda(itens, "2026-11-18").map((i) => i.id)).toEqual(["b", "a"]);
+  });
+
+  it("lembrete atrasado não entra (continua aparecendo como atrasado)", () => {
+    const lembrete = { id: "l", data: "2026-11-01", pet };
+    expect(historicoDaAgenda([lembrete], "2026-11-18")).toEqual([]);
+  });
+
+  it("no mesmo dia, o horário mais tarde vem primeiro", () => {
+    const itens = [item("manha", "2026-11-10", { hora: "09:00" }), item("tarde", "2026-11-10", { hora: "15:00" })];
+    expect(historicoDaAgenda(itens, "2026-11-18").map((i) => i.id)).toEqual(["tarde", "manha"]);
+  });
+});
+
+describe("erroDataAgendada: agendar só de hoje para frente", () => {
+  it("hoje e o futuro podem", () => {
+    hojeE(2026, 11, 18);
+    expect(erroDataAgendada("18/11/2026")).toBe("");
+    expect(erroDataAgendada("10/01/2027")).toBe("");
+  });
+
+  it("ontem não pode", () => {
+    hojeE(2026, 11, 18);
+    expect(erroDataAgendada("17/11/2026")).toBe("A data do agendamento não pode ser no passado.");
+  });
+
+  it("data incompleta continua com o aviso de sempre", () => {
+    expect(erroDataAgendada("18/11")).not.toBe("");
+  });
+});
+
+describe("dataCurta", () => {
+  it("este ano: só dia e mês", () => {
+    hojeE(2026, 11, 18);
+    expect(dataCurta("2026-12-09")).toBe("09/12");
+  });
+
+  it("outro ano: com o ano do lado", () => {
+    hojeE(2026, 11, 18);
+    expect(dataCurta("2027-01-10")).toBe("10/01/2027");
+  });
+
+  it("no card da tela inicial também", () => {
+    hojeE(2026, 11, 18);
+    expect(quandoEOnde({ data: "2027-01-10", tipo: "vermifugo" })).toBe(
+      "10/01/2027 · Lembrete de vermífugo"
+    );
+  });
+});
+
+describe("repetirDaProxima: qual 'Repetir em' estava marcado", () => {
+  it("bate com um botão: '3 meses'", () => {
+    expect(repetirDaProxima("2026-11-09", "2027-02-09")).toEqual({ repetir: "3 meses" });
+  });
+
+  it("bate com um botão de dias: '21 dias'", () => {
+    expect(repetirDaProxima("2026-11-01", "2026-11-22")).toEqual({ repetir: "21 dias" });
+  });
+
+  it("meses que não têm botão: 'Outro' com 2 meses", () => {
+    expect(repetirDaProxima("2026-11-10", "2027-01-10")).toEqual({
+      repetir: "Outro",
+      quantidade: "2",
+      tempo: "mes",
+    });
+  });
+
+  it("dias que não têm botão: 'Outro' com 45 dias", () => {
+    expect(repetirDaProxima("2026-11-10", "2026-12-25")).toEqual({
+      repetir: "Outro",
+      quantidade: "45",
+      tempo: "dia",
+    });
+  });
+
+  it("sem próxima dose: nada marcado", () => {
+    expect(repetirDaProxima("2026-11-10", null)).toEqual({ repetir: "" });
   });
 });
 

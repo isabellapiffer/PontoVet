@@ -2,18 +2,13 @@ import { useState } from "react";
 import CampoData from "./CampoData.jsx";
 import { validarData, paraDataISO, deDataISO } from "../formatadores.js";
 import { hojeISO, somarIntervalo } from "../lembretes.js";
-import { VACINAS_POR_ESPECIE, VACINAS_OUTRAS_ESPECIES, nomeDaVacina } from "../vacinas.js";
+import {
+  VACINAS_POR_ESPECIE,
+  VACINAS_OUTRAS_ESPECIES,
+  nomeDaVacina,
+  alternarVacina,
+} from "../vacinas.js";
 import "./vacinas.css";
-
-// Grupos em que só dá para marcar UMA (marcar outra do grupo desmarca a anterior)
-const SO_UMA_DO_GRUPO = {
-  Canino: [["V10 (polivalente)", "V8 (polivalente)"]],
-  Felino: [["V3", "V4", "V5"]],
-};
-// Pares que não podem ir juntos (a V5 já protege contra FeLV)
-const NAO_PODEM_JUNTAS = {
-  Felino: [["V5", "FeLV"]],
-};
 
 // Em quanto tempo é a próxima aplicação: [texto do botão, quantidade, tempo]
 const PROXIMAS = [
@@ -29,32 +24,26 @@ function calcularProxima(dataAplicacao, escolha) {
   return somarIntervalo(paraDataISO(dataAplicacao), opcao[1], opcao[2]);
 }
 
-function alternar(marcadas, opcao, especie) {
-  if (marcadas.includes(opcao)) {
-    return marcadas.filter((v) => v !== opcao);
-  }
-
-  // Tira as que não combinam com a nova
-  const conflitos = new Set();
-  for (const grupo of SO_UMA_DO_GRUPO[especie] || []) {
-    if (grupo.includes(opcao)) grupo.forEach((v) => v !== opcao && conflitos.add(v));
-  }
-  for (const [a, b] of NAO_PODEM_JUNTAS[especie] || []) {
-    if (opcao === a) conflitos.add(b);
-    if (opcao === b) conflitos.add(a);
-  }
-
-  return [...marcadas.filter((v) => !conflitos.has(v)), opcao];
-}
-
 // Mini formulário para registrar uma ou mais vacinas de uma vez.
 // Cada vacina marcada tem a própria data de aplicação e a próxima aplicação.
-export default function RegistrarVacinas({ especie, aoAdicionar, aoCancelar }) {
+// iniciais: vacinas que já vêm marcadas, pelo nome do banco (ex.: ["V10", "Raiva"]);
+// dataInicial: "18/11/2026" para todas elas (usado no "Registrar aplicação" da Agenda)
+export default function RegistrarVacinas({
+  especie,
+  aoAdicionar,
+  aoCancelar,
+  iniciais = [],
+  dataInicial = "",
+}) {
   const opcoes = VACINAS_POR_ESPECIE[especie] || VACINAS_OUTRAS_ESPECIES;
+  // "V10" -> "V10 (polivalente)" (o botão da lista)
+  const marcadasIniciais = opcoes.filter((opcao) => iniciais.includes(nomeDaVacina(opcao)));
 
-  const [marcadas, setMarcadas] = useState([]);
+  const [marcadas, setMarcadas] = useState(marcadasIniciais);
   // datas[opcao] = { data, proxima ("14 dias", "21 dias" ou "1 ano"), repetir }
-  const [datas, setDatas] = useState({});
+  const [datas, setDatas] = useState(
+    Object.fromEntries(marcadasIniciais.map((opcao) => [opcao, { data: dataInicial }]))
+  );
   const [erro, setErro] = useState("");
 
   function mudarData(opcao, campo, valor) {
@@ -132,7 +121,7 @@ export default function RegistrarVacinas({ especie, aoAdicionar, aoCancelar }) {
                   ? "sim-nao-opcao sim-nao-ativo"
                   : "sim-nao-opcao"
               }
-              onClick={() => setMarcadas(alternar(marcadas, opcao, especie))}
+              onClick={() => setMarcadas(alternarVacina(marcadas, opcao, especie))}
             >
               {opcao}
             </button>

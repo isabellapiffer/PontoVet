@@ -12,12 +12,19 @@ import {
   resumoPreparo,
   horariosDoPreparo,
   proximosDaAgenda,
+  historicoDaAgenda,
   nomeDoTipo,
   itensDosCompromissos,
+  dataCurta,
 } from "../lembretes.js";
 import { nomeComConcentracao, resumoMedicacao } from "../componentes/Medicacoes.jsx";
 import AdicionarNaAgenda from "../componentes/AdicionarNaAgenda.jsx";
-import { deDataISO } from "../formatadores.js";
+import EditarCompromisso from "../componentes/EditarCompromisso.jsx";
+import EditarPrevencao from "../componentes/EditarPrevencao.jsx";
+import RegistrarAplicacao from "../componentes/RegistrarAplicacao.jsx";
+
+// Lembretes que o lápis consegue editar (vêm do histórico do pet)
+const TIPOS_EDITAVEIS = ["vermifugo", "antiparasitario"];
 import "./agenda.css";
 
 // Ícone e nome de cada tipo de item da lista
@@ -175,6 +182,20 @@ export default function Agenda() {
     return () => clearTimeout(relogio); // aviso novo antes de acabar: recomeça a contar
   }, [avisoSalvo]);
 
+  // Item aberto no lápis (agendamento ou lembrete, ou null = fechado)
+  const [editando, setEditando] = useState(null);
+  // Vacina agendada aberta no "Registrar aplicação" (ou null = fechado)
+  const [registrando, setRegistrando] = useState(null);
+
+  // Aviso "Cadastre um pet..." ao tocar no "+" sem ter pet (some sozinho também)
+  const [avisoSemPet, setAvisoSemPet] = useState(false);
+
+  useEffect(() => {
+    if (!avisoSemPet) return;
+    const relogio = setTimeout(() => setAvisoSemPet(false), 6000);
+    return () => clearTimeout(relogio);
+  }, [avisoSemPet]);
+
   useEffect(() => {
     async function iniciar() {
       const {
@@ -260,31 +281,7 @@ export default function Agenda() {
     .sort((a, b) => (a.hora || "99").localeCompare(b.hora || "99"));
   const hoje = hojeISO();
   const proximos = proximosDaAgenda(todos, hoje, diaEscolhido);
-
-  async function excluirCompromisso() {
-    if (salvando) return;
-    if (!window.confirm("Excluir este item da agenda?")) return;
-
-    setSalvando(true);
-    setErroGaveta("");
-
-    const { data: apagados, error } = await supabase
-      .from("compromissos")
-      .delete()
-      .eq("id", itemAberto.compromisso.id)
-      .eq("tutor_id", usuarioId)
-      .select("id");
-
-    setSalvando(false);
-    // Sem erro mas sem linha apagada = o banco bloqueou (regra de segurança)
-    if (error || !apagados?.length) {
-      setErroGaveta("Não foi possível excluir. Tente de novo.");
-      return;
-    }
-
-    await carregarCompromissos(usuarioId);
-    setItemAberto(null);
-  }
+  const historico = historicoDaAgenda(itensCompromissos, hoje);
 
   // Setas do topo: andam uma semana (faixa) ou um mês (calendário aberto)
   function andar(direcao) {
@@ -348,7 +345,7 @@ export default function Agenda() {
         </span>
         {comData ? (
           <span className="agenda-item-hora agenda-item-quando">
-            {deDataISO(item.data).slice(0, 5)}
+            {dataCurta(item.data)}
             {item.hora && <small>{item.hora}</small>}
           </span>
         ) : (
@@ -490,6 +487,14 @@ export default function Agenda() {
         </section>
       )}
 
+      {/* Histórico de agendamentos: os que já passaram, mais recente primeiro (segue o filtro de pet) */}
+      {!carregando && historico.length > 0 && (
+        <section className="agenda-dia-lista">
+          <h2 className="agenda-dia-titulo">Histórico de agendamentos</h2>
+          {historico.map((item) => itemDaLista(item, true))}
+        </section>
+      )}
+
       {/* Gaveta de detalhes */}
       {itemAberto && (
         <div className="agenda-gaveta-fundo" onClick={() => setItemAberto(null)}>
@@ -510,9 +515,23 @@ export default function Agenda() {
                     : itemAberto.titulo}
                 </h2>
               </div>
-              <button className="agenda-gaveta-fechar" aria-label="Fechar" onClick={() => setItemAberto(null)}>
-                <i className="fa-solid fa-xmark"></i>
-              </button>
+              <div className="agenda-gaveta-acoes">
+                {/* Lápis: abre o formulário preenchido, com o "Apagar" lá dentro.
+                    Agendamento do "+" e lembrete de vermífugo/antipulgas.
+                    (Os agendados pelo app vão ter "Remarcar" e "Cancelar agendamento") */}
+                {(itemAberto.compromisso || TIPOS_EDITAVEIS.includes(itemAberto.tipo)) && (
+                  <button
+                    className="agenda-gaveta-fechar"
+                    aria-label="Editar"
+                    onClick={() => setEditando(itemAberto)}
+                  >
+                    <i className="fa-solid fa-pen"></i>
+                  </button>
+                )}
+                <button className="agenda-gaveta-fechar" aria-label="Fechar" onClick={() => setItemAberto(null)}>
+                  <i className="fa-solid fa-xmark"></i>
+                </button>
+              </div>
             </div>
 
             <dl className="agenda-gaveta-dados">
@@ -575,15 +594,12 @@ export default function Agenda() {
             {erroGaveta && <p className="agenda-gaveta-erro">{erroGaveta}</p>}
 
             {itemAberto.compromisso ? (
-              // Adicionado pelo "+": dá para excluir.
-              // (Os agendados pelo app vão ter "Remarcar" e "Cancelar agendamento")
-              <button
-                className="agenda-gaveta-botao agenda-gaveta-botao-excluir"
-                onClick={excluirCompromisso}
-                disabled={salvando}
-              >
-                {salvando ? "Excluindo..." : "Excluir da agenda"}
-              </button>
+              // Vacina agendada: registrar a aplicação (vai para o histórico do pet)
+              itemAberto.tipo === "vacina" && (
+                <button className="agenda-gaveta-botao" onClick={() => setRegistrando(itemAberto)}>
+                  Registrar aplicação
+                </button>
+              )
             ) : itemAberto.tipo === "medicacao" ? (
               <button className="agenda-gaveta-botao" onClick={marcarComoDado} disabled={salvando}>
                 {salvando ? "Salvando..." : "Marcar como dado"}
@@ -600,12 +616,14 @@ export default function Agenda() {
         </div>
       )}
 
-      {/* Botão redondo "+" (só depois de carregar e com pelo menos um pet) */}
-      {!carregando && pets.length > 0 && (
+      {/* Botão redondo "+" (depois de carregar). Sem pet, avisa para cadastrar um. */}
+      {!carregando && (
         <button
           className="agenda-botao-adicionar"
           aria-label="Adicionar na agenda"
-          onClick={() => setAdicionando(true)}
+          onClick={() =>
+            pets.length > 0 ? setAdicionando(true) : setAvisoSemPet(true)
+          }
         >
           <i className="fa-solid fa-plus"></i>
         </button>
@@ -629,6 +647,61 @@ export default function Agenda() {
           <span>Salvo no histórico do {avisoSalvo.nome}</span>
           <button className="agenda-aviso-ver" onClick={() => navigate(`/pet/${avisoSalvo.id}`)}>
             Ver
+          </button>
+        </div>
+      )}
+
+      {editando?.compromisso && (
+        <EditarCompromisso
+          compromisso={editando.compromisso}
+          tutorId={usuarioId}
+          aoFechar={() => setEditando(null)}
+          aoSalvar={async () => {
+            await carregarCompromissos(usuarioId);
+            setEditando(null);
+            setItemAberto(null);
+          }}
+        />
+      )}
+
+      {registrando && (
+        <RegistrarAplicacao
+          compromisso={registrando.compromisso}
+          pet={registrando.pet}
+          tutorId={usuarioId}
+          aoFechar={() => setRegistrando(null)}
+          aoSalvar={async () => {
+            await Promise.all([carregarPets(usuarioId), carregarCompromissos(usuarioId)]);
+            setRegistrando(null);
+            setItemAberto(null);
+          }}
+        />
+      )}
+
+      {editando && !editando.compromisso && (
+        <EditarPrevencao
+          historico={editando.historico}
+          petId={editando.pet.id}
+          tutorId={usuarioId}
+          aoFechar={() => setEditando(null)}
+          aoSalvar={async () => {
+            await carregarPets(usuarioId);
+            setEditando(null);
+            setItemAberto(null);
+          }}
+        />
+      )}
+
+      {avisoSemPet && (
+        <div className="agenda-aviso" role="status">
+          <span>Cadastre um pet para fazer um agendamento</span>
+          <button
+            className="agenda-aviso-ver"
+            onClick={() =>
+              navigate("/meus-animais", { state: { abrirFormulario: true } })
+            }
+          >
+            Cadastrar pet
           </button>
         </div>
       )}

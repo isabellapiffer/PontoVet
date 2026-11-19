@@ -1,5 +1,5 @@
 import { supabase } from "./supabaseClient.js";
-import { deDataISO } from "./formatadores.js";
+import { deDataISO, validarData, paraDataISO } from "./formatadores.js";
 
 // Só medicações dadas a cada semana(s), mês(es) ou ano(s) geram lembrete.
 // As de horas e dias ficariam lembrando todo dia.
@@ -35,6 +35,52 @@ export function somarIntervalo(dataISO, quantidade, tempo) {
   const m = String(data.getMonth() + 1).padStart(2, "0");
   const d = String(data.getDate()).padStart(2, "0");
   return `${data.getFullYear()}-${m}-${d}`;
+}
+
+// "Repetir em" do vermífugo e do antipulgas: [texto do botão, quantidade, tempo].
+// Depois destes vem o botão "Outro", que abre um campo para digitar a quantidade
+export const REPETIR = [
+  ["15 dias", 15, "dia"],
+  ["21 dias", 21, "dia"],
+  ["3 meses", 3, "mes"],
+  ["4 meses", 4, "mes"],
+  ["6 meses", 6, "mes"],
+  ["1 ano", 1, "ano"],
+];
+
+// O contrário do "Repetir em": com a data e a próxima dose, descobre o que estava
+// marcado, para o formulário de editar abrir preenchido.
+// Ex.: ("2026-11-09", "2027-02-09") -> { repetir: "3 meses" }
+//      ("2026-11-10", "2026-12-25") -> { repetir: "Outro", quantidade: "45", tempo: "dia" }
+export function repetirDaProxima(dataISO, proxima) {
+  if (!dataISO || !proxima) return { repetir: "" };
+
+  const botao = REPETIR.find(([, qtd, tempo]) => somarIntervalo(dataISO, qtd, tempo) === proxima);
+  if (botao) return { repetir: botao[0] };
+
+  // O campo do "Outro" aceita até 2 dígitos: tenta meses, depois dias
+  for (let meses = 1; meses <= 99; meses++) {
+    if (somarIntervalo(dataISO, meses, "mes") === proxima) {
+      return { repetir: "Outro", quantidade: String(meses), tempo: "mes" };
+    }
+  }
+  for (let dias = 1; dias <= 99; dias++) {
+    if (somarIntervalo(dataISO, dias, "dia") === proxima) {
+      return { repetir: "Outro", quantidade: String(dias), tempo: "dia" };
+    }
+  }
+  return { repetir: "" };
+}
+
+// Troca um registro do histórico (vermífugo, antipulgas, vacina) pelo mesmo com as
+// mudanças. Acha o registro pelo produto e pela data.
+// Ex.: trocarRegistro(lista, registro, { proxima: null }) tira o lembrete
+export function trocarRegistro(lista, registro, mudancas) {
+  return (lista || []).map((item) =>
+    item?.produto === registro.produto && item?.data === registro.data
+      ? { ...item, ...mudancas }
+      : item
+  );
 }
 
 // Todos os lembretes de um pet (vencidos ou não), do mais antigo para o mais novo
@@ -73,15 +119,17 @@ export function lembretesDoPet(pet) {
       titulo: `Vacina ${vacina.produto}`,
       data: vacina.proxima,
       pet,
+      // De onde veio: para editar ou apagar o lembrete na Agenda
+      historico: { coluna: "vacinas", registro: vacina },
     });
   });
 
   // Vermífugo e antipulgas: vale a vez MAIS RECENTE da lista inteira
   // (se trocou de Drontal para outro vermífugo, a próxima do Drontal não conta mais)
   [
-    ["vermifugo", "Vermífugo", pet.vermifugacoes],
-    ["antiparasitario", "Antipulgas e carrapatos", pet.antiparasitarios],
-  ].forEach(([tipo, nomeTipo, lista]) => {
+    ["vermifugo", "Vermífugo", pet.vermifugacoes, "vermifugacoes"],
+    ["antiparasitario", "Antipulgas e carrapatos", pet.antiparasitarios, "antiparasitarios"],
+  ].forEach(([tipo, nomeTipo, lista, coluna]) => {
     const validos = (lista || []).filter((registro) => registro?.produto && registro.data);
     if (!validos.length) return;
     const ultimaData = validos.reduce((maior, r) => (r.data > maior ? r.data : maior), "");
@@ -94,6 +142,7 @@ export function lembretesDoPet(pet) {
           titulo: `${nomeTipo} ${registro.produto}`,
           data: registro.proxima,
           pet,
+          historico: { coluna, registro },
         });
       });
   });
@@ -262,6 +311,15 @@ export function proximosDaAgenda(itens, hoje, diaEscolhido) {
   return cincoMaisPerto(itens.filter((item) => item.data > hoje && item.data !== diaEscolhido));
 }
 
+// "Histórico de agendamentos" da Agenda: os agendamentos (compromissos) que já
+// passaram, do mais recente para o mais antigo. Lembrete atrasado não entra:
+// ele continua na Agenda como "atrasado", porque ainda precisa ser feito.
+export function historicoDaAgenda(itens, hoje) {
+  return itens
+    .filter((item) => item.compromisso && item.data < hoje)
+    .sort((a, b) => (b.data + (b.hora || "")).localeCompare(a.data + (a.hora || "")));
+}
+
 // "Próximos agendamentos" da tela inicial: compromissos de hoje em diante e
 // lembretes de amanhã em diante (os de hoje já aparecem em Lembretes)
 export function proximosDaTelaInicial(pets, compromissos, hoje) {
@@ -270,10 +328,26 @@ export function proximosDaTelaInicial(pets, compromissos, hoje) {
   return cincoMaisPerto([...lembretes, ...agendados]);
 }
 
+// Data de AGENDAR (consulta, vacina, exame...): só de hoje para frente.
+// Devolve a mensagem de erro, ou "" se estiver certa. Ex.: ontem -> "...no passado."
+// (Registrar o que já aconteceu continua aceitando data passada)
+export function erroDataAgendada(dataBR) {
+  const erro = validarData(dataBR);
+  if (erro) return erro;
+  if (paraDataISO(dataBR) < hojeISO()) return "A data do agendamento não pode ser no passado.";
+  return "";
+}
+
+// Data curta das listas: "09/12" neste ano; "10/01/2027" em outro ano
+export function dataCurta(dataISO) {
+  const completa = deDataISO(dataISO); // "10/01/2027"
+  return dataISO.slice(0, 4) === hojeISO().slice(0, 4) ? completa.slice(0, 5) : completa;
+}
+
 // 2ª linha do card da tela inicial:
 // "11/11 às 15:00 · Dra Ana" (compromisso) ou "30/11 · Lembrete de vacina" (lembrete)
 export function quandoEOnde(item) {
-  let texto = deDataISO(item.data).slice(0, 5);
+  let texto = dataCurta(item.data);
   if (item.hora) texto += ` às ${item.hora}`;
   const onde = item.compromisso ? item.compromisso.local : nomeDoTipo(item);
   return onde ? `${texto} · ${onde}` : texto;

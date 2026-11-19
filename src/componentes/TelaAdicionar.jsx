@@ -64,17 +64,19 @@ export function Alternador({ opcoes, valor, aoMudar, rotulo }) {
 
 // Botões redondos para escolher UMA opção (ex.: os tipos de exame).
 // opcoes: lista de textos ou de pares [valor, texto]
+// valor: a escolhida ("V10") ou, para marcar várias, a lista das marcadas (["V10", "Raiva"])
 export function Escolhas({ opcoes, valor, aoEscolher }) {
   return (
     <div className="add-vacinas">
       {opcoes.map((opcao) => {
         const [chave, texto] = Array.isArray(opcao) ? opcao : [opcao, opcao];
+        const ativa = Array.isArray(valor) ? valor.includes(chave) : valor === chave;
         return (
           <button
             key={chave}
             type="button"
-            aria-pressed={valor === chave}
-            className={valor === chave ? "add-vacina add-vacina-ativa" : "add-vacina"}
+            aria-pressed={ativa}
+            className={ativa ? "add-vacina add-vacina-ativa" : "add-vacina"}
             onClick={() => aoEscolher(chave)}
           >
             {texto}

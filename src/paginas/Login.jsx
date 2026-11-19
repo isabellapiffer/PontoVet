@@ -32,6 +32,14 @@ export default function Login() {
   const [mostrarSenhaEntrar, setMostrarSenhaEntrar] = useState(false);
   const [erroEntrar, setErroEntrar] = useState("");
 
+  // Recuperar senha: e-mail -> código que chega no e-mail -> senha nova
+  const [emailRecuperar, setEmailRecuperar] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [novaSenha, setNovaSenha] = useState("");
+  const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false);
+  const [confirmarNovaSenha, setConfirmarNovaSenha] = useState("");
+  const [erroRecuperar, setErroRecuperar] = useState("");
+
   const [email, setEmail] = useState("");
   const [emailExiste, setEmailExiste] = useState(false);
   const [senha, setSenha] = useState("");
@@ -165,6 +173,9 @@ export default function Login() {
     // Por enquanto o "Criar conta" vai direto para o tutor (sem "Sou tutor / Sou profissional")
     if (passo === "formTutor") setPasso("entrar");
     if (passo === "confirmeEmail") setPasso("entrar");
+    setErroRecuperar("");
+    if (passo === "recuperar") setPasso("entrar");
+    if (passo === "codigo") setPasso("recuperar");
     if (passo === "formProfissional") setPasso("tipoProfissional");
   }
 
@@ -189,6 +200,76 @@ export default function Login() {
 
     // Passa pela tela Completar cadastro: se faltar o cadastro, ela mostra o
     // formulário; se já tiver, ela leva direto para o voltarPara.
+    navigate(linkCompletarCadastro(voltarPara));
+  }
+
+  async function enviarCodigo() {
+    if (enviando) return;
+    setErroRecuperar("");
+
+    if (!emailRecuperar) {
+      setErroRecuperar("Digite o seu e-mail.");
+      return;
+    }
+
+    setEnviando(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(emailRecuperar);
+    setEnviando(false);
+
+    if (error) {
+      setErroRecuperar(mensagemDeErro(error));
+      return;
+    }
+
+    setPasso("codigo");
+  }
+
+  async function salvarNovaSenha() {
+    if (enviando) return;
+    setErroRecuperar("");
+
+    if (!codigo) {
+      setErroRecuperar("Digite o código que chegou no seu e-mail.");
+      return;
+    }
+
+    if (!validarSenha(novaSenha)) {
+      setErroRecuperar("A senha não atende aos requisitos mínimos.");
+      return;
+    }
+
+    if (novaSenha !== confirmarNovaSenha) {
+      setErroRecuperar("As senhas não coincidem.");
+      return;
+    }
+
+    setEnviando(true);
+
+    // O código certo faz a pessoa entrar na conta; aí dá para trocar a senha
+    const { error } = await supabase.auth.verifyOtp({
+      email: emailRecuperar,
+      token: codigo,
+      type: "recovery",
+    });
+
+    if (error) {
+      setErroRecuperar(
+        "Código errado ou vencido. Confira o e-mail ou volte e peça um código novo."
+      );
+      setEnviando(false);
+      return;
+    }
+
+    const { error: erroSenha } = await supabase.auth.updateUser({
+      password: novaSenha,
+    });
+
+    if (erroSenha) {
+      setErroRecuperar(mensagemDeErro(erroSenha));
+      setEnviando(false);
+      return;
+    }
+
     navigate(linkCompletarCadastro(voltarPara));
   }
 
@@ -487,7 +568,15 @@ export default function Login() {
             Entrar
           </button>
 
-          <span className="link-esqueceu">Esqueceu seu login/senha?</span>
+          <button
+            className="link-esqueceu"
+            onClick={() => {
+              setEmailRecuperar(emailEntrar);
+              setPasso("recuperar");
+            }}
+          >
+            Esqueceu seu e-mail/senha?
+          </button>
 
           <button
             className="botao-criar-conta"
@@ -508,6 +597,123 @@ export default function Login() {
           <p className="conta-criada-spam">
             Não chegou? Confira também a pasta de spam.
           </p>
+        </div>
+      )}
+
+      {passo === "recuperar" && (
+        <div className="login-form">
+          <h3 className="login-secao-titulo">Recuperar senha</h3>
+          <p className="dica-campo">
+            Digite o e-mail da sua conta. Vamos enviar um código para você
+            criar uma senha nova.
+          </p>
+
+          <label>
+            E-mail
+            <input
+              type="email"
+              placeholder="seuemail@exemplo.com"
+              value={emailRecuperar}
+              onChange={(e) => setEmailRecuperar(e.target.value)}
+            />
+          </label>
+
+          {erroRecuperar && <span className="aviso-cpf">{erroRecuperar}</span>}
+
+          <button
+            className="botao-login"
+            onClick={enviarCodigo}
+            disabled={enviando}
+          >
+            {enviando ? "Enviando..." : "Enviar código"}
+          </button>
+        </div>
+      )}
+
+      {passo === "codigo" && (
+        <div className="login-form">
+          <h3 className="login-secao-titulo">Criar senha nova</h3>
+          <p className="dica-campo">
+            Enviamos um código para <strong>{emailRecuperar}</strong>. Não
+            chegou? Confira também a pasta de spam.
+          </p>
+
+          <label>
+            Código
+            <input
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="Código do e-mail"
+              maxLength={10}
+              value={codigo}
+              onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ""))}
+            />
+          </label>
+
+          <label>
+            Nova senha
+            <div className="campo-senha">
+              <input
+                type={mostrarNovaSenha ? "text" : "password"}
+                placeholder="Crie uma senha"
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+                className={
+                  novaSenha.length === 0
+                    ? ""
+                    : validarSenha(novaSenha)
+                    ? "campo-valido"
+                    : "campo-invalido"
+                }
+              />
+              <i
+                className={`fa-solid ${
+                  mostrarNovaSenha ? "fa-eye-slash" : "fa-eye"
+                } icone-olho`}
+                onClick={() => setMostrarNovaSenha(!mostrarNovaSenha)}
+              ></i>
+            </div>
+            {novaSenha.length > 0 && (
+              <div className="requisitos-senha">
+                {requisitosSenha(novaSenha).map((requisito) => (
+                  <span
+                    key={requisito.texto}
+                    className={requisito.ok ? "requisito-ok" : "requisito-erro"}
+                  >
+                    {requisito.texto}
+                  </span>
+                ))}
+              </div>
+            )}
+          </label>
+
+          <label>
+            Confirmar nova senha
+            <input
+              type={mostrarNovaSenha ? "text" : "password"}
+              placeholder="Repita a senha"
+              value={confirmarNovaSenha}
+              onChange={(e) => setConfirmarNovaSenha(e.target.value)}
+              className={
+                confirmarNovaSenha.length === 0
+                  ? ""
+                  : confirmarNovaSenha === novaSenha
+                  ? "campo-valido"
+                  : "campo-invalido"
+              }
+            />
+          </label>
+
+          {erroRecuperar && <span className="aviso-cpf">{erroRecuperar}</span>}
+
+          <button
+            className="botao-login"
+            onClick={salvarNovaSenha}
+            disabled={enviando}
+          >
+            {enviando ? "Salvando..." : "Salvar nova senha"}
+          </button>
         </div>
       )}
 

@@ -10,15 +10,6 @@ function naTela(data) {
   return `${dd}/${mm}/${data.getFullYear()}`;
 }
 
-test('sem nenhum pet cadastrado, o botão "+" não aparece', async ({ page }) => {
-  await usarSupabaseFalso(page, { ...DADOS_ANA, pets: [] });
-  await page.goto("/agenda");
-
-  // Espera terminar de carregar (o "+" só pode aparecer depois disso)
-  await expect(page.getByText("Nada marcado para este dia.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Adicionar na agenda" })).toHaveCount(0);
-});
-
 test('com pet, o "+" aparece; a data já vem com o dia escolhido e "Data atual" preenche hoje', async ({ page }) => {
   await usarSupabaseFalso(page, DADOS_ANA);
   await page.goto("/agenda");
@@ -53,14 +44,14 @@ test('Outros: "O que gostaria de agendar?", Data, Hora, Local e Observação', a
   await expect(page.getByText("Preencha o que gostaria de agendar.")).toBeVisible();
 });
 
-// Remédio > Medicamento: abre a tela com a Luna, que já tem Dermatite em tratamento.
+// Medicamentos > Medicamento: abre a tela com a Luna, que já tem Dermatite em tratamento.
 // Devolve uma função que espera o pedido de salvar no pet e devolve o que foi enviado
 async function abrirMedicamento(page) {
   const luna = { ...DADOS_ANA.pets[0], doencas_em_tratamento: [{ doenca: "Dermatite" }] };
   await usarSupabaseFalso(page, { ...DADOS_ANA, pets: [luna] });
   await page.goto("/agenda");
   await page.getByRole("button", { name: "Adicionar na agenda" }).click();
-  await page.getByRole("button", { name: "Remédio" }).click();
+  await page.getByRole("button", { name: "Medicamentos" }).click();
   await page.getByRole("button", { name: "Medicamento" }).click();
 
   return async () => {
@@ -102,4 +93,83 @@ test("Medicamento sem Diagnóstico: vai para Outros medicamentos", async ({ page
   const corpo = await enviado();
   expect(corpo.outros_medicamentos).toEqual([expect.objectContaining({ nome: "Meloxicam" })]);
   expect(corpo.medicacoes).toBeUndefined();
+});
+
+// Medicamentos > Vermífugo > Registrar: preenche o produto e a data, e marca "Outro" no "Repetir em".
+// Devolve uma função que espera o pedido de salvar no pet e devolve o que foi enviado
+async function abrirVermifugoComOutro(page) {
+  await usarSupabaseFalso(page, DADOS_ANA);
+  await page.goto("/agenda");
+  await page.getByRole("button", { name: "Adicionar na agenda" }).click();
+  await page.getByRole("button", { name: "Medicamentos" }).click();
+  await expect(page.getByRole("heading", { name: "Novo medicamento" })).toBeVisible();
+  await expect(page.getByText("Que tipo de medicamento?")).toBeVisible();
+  await page.getByRole("button", { name: "Vermífugo" }).click();
+  await page.getByPlaceholder("Ex: Drontal").fill("Drontal");
+  await page.getByPlaceholder("DD/MM/AAAA").fill("10/11/2026");
+
+  // O campo da quantidade só aparece depois de tocar em "Outro"
+  await expect(page.getByLabel("Quantidade")).toHaveCount(0);
+  await page.getByRole("button", { name: "Outro", exact: true }).click();
+
+  return async () => {
+    const pedido = await page.waitForRequest(
+      (r) => r.url().includes("/rest/v1/pets") && r.method() === "PATCH"
+    );
+    return pedido.postDataJSON();
+  };
+}
+
+test('Repetir em "Outro": 45 dias depois de 10/11/2026 dá 25/12/2026', async ({ page }) => {
+  const enviado = await abrirVermifugoComOutro(page);
+
+  // Só números, e no máximo 2: "4a5b9" vira "45"
+  await page.getByLabel("Quantidade").pressSequentially("4a5b9");
+  await expect(page.getByLabel("Quantidade")).toHaveValue("45");
+  await expect(page.getByText("Próxima dose: 25/12/2026")).toBeVisible();
+
+  await page.getByRole("button", { name: "Salvar no histórico" }).click();
+  const corpo = await enviado();
+  expect(corpo.vermifugacoes).toEqual([
+    expect.objectContaining({ produto: "Drontal", data: "2026-11-10", proxima: "2026-12-25" }),
+  ]);
+});
+
+test('Repetir em "Outro": trocar para meses, 2 meses depois de 10/11/2026 dá 10/01/2027', async ({ page }) => {
+  const enviado = await abrirVermifugoComOutro(page);
+
+  await page.getByLabel("Quantidade").fill("2");
+  // A lista do tempo é a última da tela (a primeira é a unidade da dose)
+  await page.locator(".lista-opcoes input").last().click();
+  await page.getByText("meses", { exact: true }).click();
+  await expect(page.getByText("Próxima dose: 10/01/2027")).toBeVisible();
+
+  await page.getByRole("button", { name: "Salvar no histórico" }).click();
+  const corpo = await enviado();
+  expect(corpo.vermifugacoes).toEqual([expect.objectContaining({ proxima: "2027-01-10" })]);
+});
+
+test('Repetir em "Outro" vazio: pede confirmação; cancelar não salva, aceitar salva sem próxima dose', async ({ page }) => {
+  const enviado = await abrirVermifugoComOutro(page);
+  let salvou = false;
+  page.on("request", (r) => {
+    if (r.url().includes("/rest/v1/pets") && r.method() === "PATCH") salvou = true;
+  });
+
+  // Cancelar: a frase aparece e nada é enviado ao banco
+  let frase = "";
+  page.once("dialog", (janela) => {
+    frase = janela.message();
+    janela.dismiss();
+  });
+  await page.getByRole("button", { name: "Salvar no histórico" }).click();
+  expect(frase).toContain("a próxima dose não vai aparecer na sua agenda");
+  await page.waitForTimeout(500);
+  expect(salvou).toBe(false);
+
+  // Aceitar: salva sem próxima dose
+  page.once("dialog", (janela) => janela.accept());
+  await page.getByRole("button", { name: "Salvar no histórico" }).click();
+  const corpo = await enviado();
+  expect(corpo.vermifugacoes).toEqual([expect.objectContaining({ produto: "Drontal", proxima: null })]);
 });

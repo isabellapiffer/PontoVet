@@ -10,12 +10,12 @@ import Medicacoes, {
 import CampoData from "./CampoData.jsx";
 import ListaOpcoes from "./ListaOpcoes.jsx";
 import { validarData, paraDataISO, deDataISO } from "../formatadores.js";
-import { hojeISO, somarIntervalo } from "../lembretes.js";
+import { hojeISO, somarIntervalo, REPETIR, erroDataAgendada } from "../lembretes.js";
 import "./historicoclinico.css";
 import "./medicacoes.css";
 import "../paginas/login.css";
 
-// "Remédio" do "+" da Agenda (protótipo de 05/11/2026). Três tipos:
+// "Medicamentos" do "+" da Agenda (protótipo de 05/11/2026). Três tipos:
 // - Medicamento: com Diagnóstico preenchido (vai para "medicacoes", ligado à doença
 //   em tratamento) ou sem (vai para "outros_medicamentos")
 // - Vermífugo e Antipulgas e carrapatos: registrar (vai para o histórico do pet)
@@ -27,25 +27,21 @@ const TIPOS_REMEDIO = [
   ["antiparasitario", "Antipulgas e carrapatos", "contra pulgas, carrapatos e outros parasitas da pele"],
 ];
 
-// "Repetir em": [texto do botão, quantidade, tempo]
-const REPETIR = [
-  ["15 dias", 15, "dia"],
-  ["21 dias", 21, "dia"],
-  ["3 meses", 3, "mes"],
-  ["4 meses", 4, "mes"],
-  ["6 meses", 6, "mes"],
-  ["1 ano", 1, "ano"],
-];
-
 // Máximo de itens em cada lista (igual ao check do banco em supabase/colunas-pets.sql).
 // Passou disso, o banco recusa; aqui a gente avisa antes com uma mensagem clara
 const LIMITE_MEDICACOES = 20;
 const LIMITE_OUTROS_MEDICAMENTOS = 50;
 
-// Próxima dose ("2027-02-05"), ou "" se ainda não dá para calcular
-function calcularProxima(data, repetir) {
+// Próxima dose ("2027-02-05"), ou "" se ainda não dá para calcular.
+// Exportado: o EditarPrevencao (lápis da Agenda) usa o mesmo cálculo
+export function calcularProxima(data, repetir, outroQuantidade, outroTempo) {
+  if (validarData(data)) return "";
+  if (repetir === "Outro") {
+    if (!Number(outroQuantidade)) return ""; // vazio ou 0: sem próxima dose
+    return somarIntervalo(paraDataISO(data), outroQuantidade, outroTempo);
+  }
   const opcao = REPETIR.find(([texto]) => texto === repetir);
-  if (!opcao || validarData(data)) return "";
+  if (!opcao) return "";
   return somarIntervalo(paraDataISO(data), opcao[1], opcao[2]);
 }
 
@@ -75,6 +71,9 @@ export default function NovoRemedio({
   const [unidade, setUnidade] = useState("");
   const [dataDada, setDataDada] = useState("");
   const [repetir, setRepetir] = useState("");
+  // "Outro" do "Repetir em": a quantidade digitada ("45") e o tempo ("dia" ou "mes")
+  const [outroQuantidade, setOutroQuantidade] = useState("");
+  const [outroTempo, setOutroTempo] = useState("dia");
   const [dataAgendada, setDataAgendada] = useState(deDataISO(diaInicial));
   const [hora, setHora] = useState("");
 
@@ -87,7 +86,7 @@ export default function NovoRemedio({
   const doencasDoPet = [
     ...new Set((pet?.doencas_em_tratamento || []).map((item) => item?.doenca).filter(Boolean)),
   ];
-  const proxima = calcularProxima(dataDada, repetir);
+  const proxima = calcularProxima(dataDada, repetir, outroQuantidade, outroTempo);
 
   function escolherPet(id) {
     aoEscolherPet(id);
@@ -162,7 +161,8 @@ export default function NovoRemedio({
   function conferirPrevencao() {
     if (!produto.trim()) return "Escreva o nome do produto.";
     const data = modo === "registrar" ? dataDada : dataAgendada;
-    const erroData = validarData(data);
+    // Agendar: só de hoje para frente
+    const erroData = modo === "registrar" ? validarData(data) : erroDataAgendada(data);
     if (erroData) return erroData;
     if (modo === "registrar" && paraDataISO(data) > hojeISO()) {
       return "A data não pode ser no futuro.";
@@ -207,6 +207,14 @@ export default function NovoRemedio({
       return;
     }
 
+    // "Outro" marcado sem a quantidade: salva sem próxima dose, mas avisa antes
+    if (tipoRemedio !== "medicamento" && modo === "registrar" && repetir === "Outro" && !proxima) {
+      const continuar = window.confirm(
+        "Você não informou quando repetir. O registro será salvo, mas a próxima dose não vai aparecer na sua agenda. Deseja salvar mesmo assim?"
+      );
+      if (!continuar) return;
+    }
+
     setSalvando(true);
     const resultado =
       tipoRemedio === "medicamento" ? await salvarMedicamento() : await salvarPrevencao();
@@ -223,7 +231,7 @@ export default function NovoRemedio({
 
   return (
     <TelaAdicionar
-      titulo="Novo remédio"
+      titulo="Novo medicamento"
       aoVoltar={aoVoltar}
       rodape={
         tipoRemedio && (
@@ -239,7 +247,7 @@ export default function NovoRemedio({
       <div className="add-campo">
         <div className="add-rotulo-linha">
           <span className="add-rotulo">
-            Que tipo de remédio? <span className="obrigatorio">*</span>
+            Que tipo de medicamento? <span className="obrigatorio">*</span>
           </span>
           <button
             type="button"
@@ -361,11 +369,33 @@ export default function NovoRemedio({
               <div className="add-campo">
                 <span className="add-rotulo">Repetir em</span>
                 <Escolhas
-                  opcoes={REPETIR.map(([texto]) => texto)}
+                  opcoes={[...REPETIR.map(([texto]) => texto), "Outro"]}
                   valor={repetir}
                   // Tocar de novo no escolhido desmarca (o campo não é obrigatório)
                   aoEscolher={(texto) => setRepetir(texto === repetir ? "" : texto)}
                 />
+                {/* "Outro": quantidade (só números) e dia(s) ou mês(es) */}
+                {repetir === "Outro" && (
+                  <div className="med-linha">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      className="med-numero"
+                      aria-label="Quantidade"
+                      maxLength={2}
+                      value={outroQuantidade}
+                      onChange={(evento) => setOutroQuantidade(evento.target.value.replace(/\D/g, ""))}
+                    />
+                    <ListaOpcoes
+                      opcoes={[
+                        ["dia", outroQuantidade === "1" ? "dia" : "dias"],
+                        ["mes", outroQuantidade === "1" ? "mês" : "meses"],
+                      ]}
+                      valor={outroTempo}
+                      aoMudar={setOutroTempo}
+                    />
+                  </div>
+                )}
                 {proxima && <span className="add-destaque">Próxima dose: {deDataISO(proxima)}</span>}
               </div>
             </>
